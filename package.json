@@ -1,0 +1,29 @@
+{
+  "description": "Webapp handling the Brault family annual pige",
+  "devDependencies": {
+    "angular-bootstrap-toggle": "^0.1.2",
+    "angular-sanitize": "^1.6.5",
+    "angular-translate": "^2.15.2",
+    "angular-translate-loader-static-files": "^2.15.2",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.47",
+    "grunt": "^1.0.1",
+    "grunt-angular-templates": "^1.1.0",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-less": "^1.4.1",
+    "grunt-contrib-uglify": "^3.0.1",
+    "grunt-ngdocs": "^0.2.10",
+    "include-all": "^4.0.3",
+    "lodash": "^4.17.4",
+    "ui-select": "^0.19.8",
+    "webpack": "^3.5.2",
+    "webpack-dev-server": "^2.7.1"
+  },
+  "license": "4",
+  "name": "pigeWebApp",
+  "repository": ".",
+  "scripts": {
+    "start": "webpack-dev-server --watch --inline"
+  }
+}

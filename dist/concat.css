@@ -1,0 +1,60 @@
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+html,
+body,
+div[ng-controller],
+div.braultPige-body {
+    height: 100%
+}
+
+div[ng-controller] {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+}
+
+.braultPige-body {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    order: 1;
+}
+
+.pige-header {
+/*    background-color: pink;*/
+    flex-grow: 0;
+    order: 1;
+    text-align: right;
+}
+
+.pige-content {
+    align-items: stretch;
+/*    background-color: lightgrey;*/
+    border:1px #ddd solid;
+    border-width:1px 0;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: flex-start;
+    order: 2;
+    overflow: scroll;
+}
+
+.pige-footer {
+/*    background-color: orange;*/
+    flex-grow: 0;
+    order: 3;
+    text-align: right;
+}
+
+/* TODO: Convert into LESS mixin */
+.lessPadding {
+    padding: 20px;
+}
+
+.ui-select-container .caret {
+    display: none;
+}
