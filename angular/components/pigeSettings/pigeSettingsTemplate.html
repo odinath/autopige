@@ -1,42 +1,39 @@
-<div class="container">
-    <form>
-        <div class="form-group row">
-            <label for="settingsNbAdmin" class="col-sm-4 col-form-label">
-                {{ 'label.max.admin' | translate }}
-            </label>
-            <div class="col-sm-8">
-                <input type="number" class="form-control" id="settingsNbAdmin" ng-model="$pigeSettingsCtrl.settings.nbAdminMax">
-            </div>
+<form>
+    <div class="form-group row">
+        <label for="settingsNbAdmin" class="col-sm-4 col-form-label">
+            {{ 'label.max.admin' | translate }}
+        </label>
+        <div class="col-sm-8">
+            <input type="number" class="form-control" id="settingsNbAdmin" ng-model="$pigeSettingsCtrl.settings.nbAdminMax">
         </div>
-        <div class="form-group row">
-            <label for="inputPassword3" class="col-sm-4 col-form-label">
-                {{ 'label.pige.activated' | translate }}
-            </label>
-            <div class="col-sm-8">
-                <toggle ng-model="$pigeSettingsCtrl.settings.isPigeActivated" on="{{ 'toggle.on' | translate }}" off="{{ 'toggle.off' | translate }}"></toggle>
-            </div>
-        </div>        
-        <div class="form-group row">
-            <label for="inputPassword3" class="col-sm-4 col-form-label">
-                {{ 'label.pige.auto' | translate }}
-            </label>
-            <div class="col-sm-8">
-                <toggle ng-model="$pigeSettingsCtrl.settings.autoPige" on="{{ 'toggle.on' | translate }}" off="{{ 'toggle.off' | translate }}"></toggle>
-            </div>
+    </div>
+    <div class="form-group row">
+        <label for="inputPassword3" class="col-sm-4 col-form-label">
+            {{ 'label.pige.activated' | translate }}
+        </label>
+        <div class="col-sm-8">
+            <toggle ng-model="$pigeSettingsCtrl.settings.isPigeActivated" on="{{ 'toggle.on' | translate }}" off="{{ 'toggle.off' | translate }}"></toggle>
         </div>
+    </div>        
+    <div class="form-group row">
+        <label for="inputPassword3" class="col-sm-4 col-form-label">
+            {{ 'label.pige.auto' | translate }}
+        </label>
+        <div class="col-sm-8">
+            <toggle ng-model="$pigeSettingsCtrl.settings.autoPige" on="{{ 'toggle.on' | translate }}" off="{{ 'toggle.off' | translate }}"></toggle>
+        </div>
+    </div>
 <!--
-        <div class="form-group row">
-            <label for="inputPassword3" class="col-sm-4 col-form-label">Schedule for pige</label>
-            <div class="col-sm-8">
-                <div class='input-group date' id='datetimepicker'>
-                    <input type='text' class="form-control" ng-model="$pigeSettingsCtrl.settings.scheduledDateTime" />
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                </div>
+    <div class="form-group row">
+        <label for="inputPassword3" class="col-sm-4 col-form-label">Schedule for pige</label>
+        <div class="col-sm-8">
+            <div class='input-group date' id='datetimepicker'>
+                <input type='text' class="form-control" ng-model="$pigeSettingsCtrl.settings.scheduledDateTime" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
             </div>
         </div>
+    </div>
 -->
-    </form>
-    
-</div>
+</form>

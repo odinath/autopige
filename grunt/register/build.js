@@ -7,6 +7,7 @@
             "concat:js",
 //            "uglify",
 //            "lessHint",
+            "concat:less",
             "less",
             "concat:css",
 //            "minify",

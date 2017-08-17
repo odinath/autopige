@@ -2,19 +2,13 @@
 .sectionPadding {
     padding: 20px 15px;
 }
-
 .buttonsAlignment {
     text-align: right;
 }
 
-.greyBackground {
-    background-color: #eee;
-}
-
 html,
 body,
-div[ng-controller],
-div.braultPige-body {
+div[ng-controller] {
     height: 100%
 }
 
@@ -24,26 +18,16 @@ div[ng-controller] {
     display: flex;
     flex-direction: column;
     
-//    .braultPige-body {
-//        align-items: stretch;
-//        display: flex;
-//        flex-direction: column;
-//        flex-grow: 1;
-//        order: 1;
-//    }
-
     .pige-header {
+        background-color: #eee;
+        .buttonsAlignment;
         flex-grow: 0;
-        .greyBackground;
         order: 1;
         .sectionPadding;
-        .buttonsAlignment;
     }
 
     .pige-content {
         align-items: stretch;
-        border:1px #ddd solid;
-        border-width:1px 0;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
@@ -52,28 +36,43 @@ div[ng-controller] {
         overflow: scroll;
         .sectionPadding;
         
-        pige-form {
+        pige-form,
+        pige-settings {
             padding: 20px;
         }
         
     }
 
     .pige-footer {
-        flex-grow: 0;
-        .greyBackground;
+        background-color: #eee;
+        .buttonsAlignment;
+        flex-grow: 0;        
         order: 3;
         .sectionPadding;
-        .buttonsAlignment;
     }
     
 }
 
-// preventing Angular flickering as app gets rendered
+/* ----------
+[ AngularJS ]
+---------- */
+
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
 
-// hiding Bootstrap's default ui-selector icon
+/* -------------------------
+[ Bootstrap's instructions ]
+------------------------- */
+
+// no icon on ui-select
 .ui-select-container .caret {
     display: none;
+}
+
+.pige-header,
+.pige-footer {
+    .btn {
+        padding: 12px 24px;
+    }    
 }

@@ -25,14 +25,12 @@
                 {{ "message.pige.auto.admin" | translate }}
             </span>
         </p>
-        <span ng-if="!$appCtrl.settings.autoPige">
-            <p ng-if="$appCtrl.currentUser.pigedGuest === ''">
-                {{ "message.pige.not.triggered" | translate }}
-            </p>
-            <p ng-if="$appCtrl.currentUser.pigedGuest !== ''">
-                {{ "message.pige.triggered" | translate: $appCtrl.currentUser }}
-            </p>
-        </span>
+        <p ng-if="!$appCtrl.settings.autoPige && $appCtrl.currentUser.pigedGuest === ''">
+            {{ "message.pige.not.triggered" | translate }}
+        </p>
+        <p ng-if="$appCtrl.currentUser.pigedGuest !== ''">
+            {{ "message.pige.triggered" | translate: $appCtrl.currentUser }}
+        </p>
     </div>
     
 </div>

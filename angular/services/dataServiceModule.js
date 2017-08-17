@@ -15,112 +15,112 @@
         };
         
         var _settings = {};
-        
-        var _currentUser = {
-            conjoint: "",
-            isAdmin: false,
-            name: {
-                first: "",
-                full: "",
-                last: "",
-            },
-            pigedGuest: ""
-        };
-        
+//        
 //        var _currentUser = {
-//            conjoint: "Nathalie Dufour",
-//            isAdmin: true,
+//            conjoint: "",
+//            isAdmin: false,
 //            name: {
-//                first: "Odin",
-//                full: "Odin Marole",
-//                last: "Marole",
+//                first: "",
+//                full: "",
+//                last: "",
 //            },
 //            pigedGuest: ""
 //        };
+        
+        var _currentUser = {
+            conjoint: "Nathalie Dufour",
+            isAdmin: true,
+            name: {
+                first: "Odin",
+                full: "Odin Marole",
+                last: "Marole",
+            },
+            pigedGuest: ""
+        };
 
-        var _guests = [];
-//        var _guests = [
-//            {
-//                conjoint: "Nathalie Dufour",
-//                isAdmin: true,
-//                name: {
-//                    first: "Odin",
-//                    full: "Odin Marole",
-//                    last: "Marole",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "Odin Marole",
-//                isAdmin: false,
-//                name: {
-//                    first: "Nathalie",
-//                    full: "Nathalie Dufour",
-//                    last: "Dufour",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: true,
-//                name: {
-//                    first: "Céline",
-//                    full: "Céline Chipoy",
-//                    last: "Chipoy",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Cédric",
-//                    full: "Cédric Marole",
-//                    last: "Marole",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Agathe",
-//                    full: "Agathe Baus",
-//                    last: "Baus",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Richard",
-//                    full: "Richard Laplante",
-//                    last: "Laplante",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Suzy",
-//                    full: "Suzy Cue",
-//                    last: "Cue",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Josiane",
-//                    full: "Josiane Balasko",
-//                    last: "Balasko",
-//                },
-//                pigedGuest: ""
-//            }
-//        ];
+//        var _guests = [];
+        var _guests = [
+            {
+                conjoint: "Nathalie Dufour",
+                isAdmin: true,
+                name: {
+                    first: "Odin",
+                    full: "Odin Marole",
+                    last: "Marole",
+                },
+                pigedGuest: ""
+            },
+            {
+                conjoint: "Odin Marole",
+                isAdmin: false,
+                name: {
+                    first: "Nathalie",
+                    full: "Nathalie Dufour",
+                    last: "Dufour",
+                },
+                pigedGuest: ""
+            },
+            {
+                conjoint: "",
+                isAdmin: true,
+                name: {
+                    first: "Céline",
+                    full: "Céline Chipoy",
+                    last: "Chipoy",
+                },
+                pigedGuest: ""
+            },
+            {
+                conjoint: "",
+                isAdmin: false,
+                name: {
+                    first: "Cédric",
+                    full: "Cédric Marole",
+                    last: "Marole",
+                },
+                pigedGuest: ""
+            },
+            {
+                conjoint: "",
+                isAdmin: false,
+                name: {
+                    first: "Agathe",
+                    full: "Agathe Baus",
+                    last: "Baus",
+                },
+                pigedGuest: ""
+            },
+            {
+                conjoint: "",
+                isAdmin: false,
+                name: {
+                    first: "Richard",
+                    full: "Richard Laplante",
+                    last: "Laplante",
+                },
+                pigedGuest: ""
+            },
+            {
+                conjoint: "",
+                isAdmin: false,
+                name: {
+                    first: "Suzy",
+                    full: "Suzy Cue",
+                    last: "Cue",
+                },
+                pigedGuest: ""
+            },
+            {
+                conjoint: "",
+                isAdmin: false,
+                name: {
+                    first: "Josiane",
+                    full: "Josiane Balasko",
+                    last: "Balasko",
+                },
+                pigedGuest: ""
+            }
+        ];
         
         /* -------------
         [ current user ]

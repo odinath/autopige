@@ -1,6 +1,19 @@
 module.exports = function(grunt) {
     
     grunt.config.set("concat", {
+
+        css: {
+            src: [
+                "node_modules/angular-bootstrap-toggle/dist/angular-bootstrap-toggle.min.css",
+                "node_modules/bootstrap/dist/css/bootstrap.min.css",
+                "node_modules/bootstrap-table/dist/bootstrap-table.min.css",
+                "node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css",
+                "node_modules/ui-select/dist/select.min.css",
+                "dist/concat.css"
+            ],
+            dest: "dist/concat.css"
+        },
+
         js: {
             src: [
                 "node_modules/jquery/dist/jquery.min.js",
@@ -24,17 +37,15 @@ module.exports = function(grunt) {
             dest: 'dist/concat.js'
         },        
 
-        css: {
+        
+        less: {
             src: [
-                "node_modules/angular-bootstrap-toggle/dist/angular-bootstrap-toggle.min.css",
-                "node_modules/bootstrap/dist/css/bootstrap.min.css",
-                "node_modules/bootstrap-table/dist/bootstrap-table.min.css",
-                "node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css",
-                "node_modules/ui-select/dist/select.min.css",
-                "dist/concat.css"
+                "styling/less/palette.less",
+                "styling/less/styling.less"
             ],
-            dest: "dist/concat.css"
+            dest: "dist/temp-concat.less"
         }
+        
     });
 
     grunt.loadNpmTasks("grunt-contrib-concat");
