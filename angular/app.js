@@ -30,7 +30,7 @@
             })
             .otherwise({
                 redirectTo: "/"
-            })
+            });
     }])
     .config(['$translateProvider', function ($translateProvider) {
         $translateProvider.useStaticFilesLoader({
@@ -60,21 +60,19 @@
 
             // set app to initial state
             this.onLogout();
-            
-            console.log($routeParams);
-            
+                        
         };
         
         this.isCurrentUserAlreadyRegistered = function() {
             return this.guests.some(function(object){
                 return (object.name.first === this.currentUser.name.first && object.name.last === this.currentUser.name.last);
             }.bind(this));
-        };        
+        };
         
         this.areRequiredFieldsFilledIn = function() {
             return (
-                this.currentUser.name.first !== "" &&
-                this.currentUser.name.last !== ""
+                (this.currentUser.name.first && this.currentUser.name.first !== "") &&
+                (this.currentUser.name.last && this.currentUser.name.last !== "")
             );
         };
         
@@ -112,7 +110,7 @@
         
         this.resetGuests = function() {
             dataService.resetGuests();
-            this.guests = dataService.getGuests();
+            this.setGuests();
         };
         
         /* ----------------
@@ -137,7 +135,9 @@
         };
         
         this.isSaveUserDisabled = function() {
-            return (JSON.stringify(this.currentUser) === JSON.stringify(this.initialCurrentUser));
+            return (JSON.stringify(this.currentUser) === JSON.stringify(this.initialCurrentUser)) ||
+                (!this.currentUser.name.first || !this.currentUser.name.last) ||
+                dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last);
         };
         
         // session
@@ -146,7 +146,6 @@
             this.resetCurrentUser();
             this.setGuests();
             this.isUserLoggedIn = false;
-            this.isPigeStarted = false;
             $location.path("default");
         };
         
@@ -155,7 +154,7 @@
             this.currentUser.name.full = this.currentUser.name.first + ' ' + this.currentUser.name.last;
             for (var key in this.currentUser.name){
                 this.currentUser.name[key] = this.currentUser.name[key].trim();
-            };
+            }
             // adding user to dataService
             dataService.addGuest(angular.copy(this.currentUser));
             // flagging the user as logged in
@@ -165,7 +164,8 @@
         };
         
         this.onSignUp = function() {
-            this.currentUser.name.full = this.currentUser.name.first + ' ' + this.currentUser.name.last;
+            // fetching all data related to registered user
+            this.currentUser = dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last);
             this.isUserLoggedIn = true;
             this.navigateToViewUser();
         };
@@ -188,12 +188,81 @@
         
         // pige
         
+        this.triggerPigeByGuest = function(guest) {
+            
+            // getting list of all guests
+            var potentialPicks = _.map(this.guests, 'name.full');
+
+            // removing names of all previously picked guests
+            potentialPicks = _.difference(potentialPicks, _.map(this.guests, 'pigedGuest')).filter(function(pigedGuest){
+                return pigedGuest !== "";
+            });
+
+            // removing name of current user (might have been removed already)
+            var index = potentialPicks.indexOf(guest.name.full);
+            if (index !== -1){
+                potentialPicks.splice(index, 1);    
+            }
+            
+            // removing name of associated conjoint (might be missing or removed already)
+            index = potentialPicks.indexOf(guest.conjoint);
+            if (index !== -1) {
+                potentialPicks.splice(index, 1);    
+            }
+            
+            // random selection of guest name
+            var pigedGuestFullName = potentialPicks[Math.floor(Math.random() * potentialPicks.length)];
+
+            // applying selection on stored data
+            dataService.applyGuestPige(angular.copy(guest), pigedGuestFullName);
+            this.setGuests();
+            
+            // updating current user data
+            guest.pigedGuest = pigedGuestFullName;
+            
+            console.log(guest.name.full + " > " + pigedGuestFullName);
+        
+        };
+        
         this.onPigeGuest = function() {
-            console.log("pige guest");
+            this.triggerPigeByGuest(this.currentUser);
         };
         
         this.onAutoPige = function() {
-            console.log("auto pige");
+            
+            console.clear();
+            
+            this.resetPigedGuests();
+            
+            var getPigedGuestInList = function() {
+                return _.map(this.guests, "pigedGuest").filter(function(pigedGuest){
+                    return pigedGuest !== "";
+                });
+            }.bind(this);
+            
+            var getConjointsStillInTheList = function(index) {
+                // getting names of all remaining guests
+                var guestsStillInTheList = this.guests.slice(0, i + 1);
+                // removing names of guests already picked
+                var namesOfGuestsStillInTheList = _.difference(_.map(guestsStillInTheList, "name.full"), getPigedGuestInList());
+                // returning names of conjoints still in the list
+                return _.intersection(namesOfGuestsStillInTheList, _.map(guestsStillInTheList, "conjoint"));   
+            }.bind(this);
+            
+            // applying a selection to each guest
+            for (var i = (this.guests.length - 1); i >= 0; i--) {
+                
+                // we want to avoid having conjoints as last two guests with no association
+                if (i < 5 && getConjointsStillInTheList(i).length >= 2) {
+                    this.guests[i].pigedGuest = getConjointsStillInTheList(i)[Math.round(Math.random())];
+                    console.log(this.guests[i].name.full + " >> " + this.guests[i].pigedGuest);
+                }
+                // applying basic guest selection
+                else {
+                    this.triggerPigeByGuest(this.guests[i]);
+                }
+            }
+            
         };
         
         this.onResetPige = function() {
@@ -204,6 +273,11 @@
             this.onLogout();
         };
         
+        this.resetPigedGuests = function() {
+            this.guests.forEach(function(guest){
+                guest.pigedGuest = "";
+            });
+        };        
         // settings
 
         this.onEditPigeSettings = function() {

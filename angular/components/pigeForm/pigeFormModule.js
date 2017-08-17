@@ -7,10 +7,9 @@ angular.module("pigeFormModule", [
 .controller("pigeFormController", function(
     $scope,
     $translate,
-    dataService,
-    
+    dataService
 ) {
-
+    
     this.$onInit = function() {
 
         // conjoints
@@ -114,7 +113,7 @@ angular.module("pigeFormModule", [
         }
         else {
             return (this.hasNbAdminMaxBeingReached() || this.isCurrentUserAlreadyRegistered());
-        };
+        }
     };
 
 })

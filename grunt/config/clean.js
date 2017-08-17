@@ -2,11 +2,11 @@ module.exports = function(grunt) {
     
     grunt.config.set("clean", {
         beforeBuild: {
-            src: ["grunt/dist/*"]
+            src: ["dist/*"]
         },
         afterBuild: {
-            src: ["grunt/dist/temp-*.js"]
-        },
+            src: ["dist/temp-*"]
+        },  
         
     });
 

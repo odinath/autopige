@@ -4,4 +4,35 @@
         {{ "title.view" | translate: $appCtrl.currentUser.name }}
     </h1>
     
+    <div ng-if="!$appCtrl.settings.isPigeActivated">
+        <p>
+            {{ "message.pige.not.activated" | translate }}
+        </p>
+        <p ng-if="$appCtrl.currentUser.isAdmin">
+            {{ "message.pige.not.activated.admin" | translate }}
+        </p>
+    </div>
+    
+    <div ng-if="$appCtrl.settings.isPigeActivated">
+        <p>
+            {{ "message.pige.activated" | translate }}
+        </p>
+        <p ng-if="$appCtrl.settings.autoPige">
+            <span ng-if="!$appCtrl.currentUser.isAdmin">
+                {{ "message.pige.auto.guest" | translate }}
+            </span>
+            <span ng-if="$appCtrl.currentUser.isAdmin">
+                {{ "message.pige.auto.admin" | translate }}
+            </span>
+        </p>
+        <span ng-if="!$appCtrl.settings.autoPige">
+            <p ng-if="$appCtrl.currentUser.pigedGuest === ''">
+                {{ "message.pige.not.triggered" | translate }}
+            </p>
+            <p ng-if="$appCtrl.currentUser.pigedGuest !== ''">
+                {{ "message.pige.triggered" | translate: $appCtrl.currentUser }}
+            </p>
+        </span>
+    </div>
+    
 </div>

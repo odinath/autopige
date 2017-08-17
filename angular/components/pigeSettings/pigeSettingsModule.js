@@ -7,8 +7,7 @@ angular.module("pigeSettingsModule", [
 .controller("pigeSettingsController", function(
     $scope,
     $translate,
-    dataService,
-    
+    dataService
 ) {
 
     this.$onInit = function() {

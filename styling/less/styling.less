@@ -1,5 +1,64 @@
-body {
-    &:after {
-        content: "LESS OK";
+// mixin
+.sectionPadding {
+    padding: 20px;
+}
+
+html,
+body,
+div[ng-controller],
+div.braultPige-body {
+    height: 100%
+}
+
+div[ng-controller] {
+    
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    
+//    .braultPige-body {
+//        align-items: stretch;
+//        display: flex;
+//        flex-direction: column;
+//        flex-grow: 1;
+//        order: 1;
+//    }
+
+    .pige-header {
+        flex-grow: 0;
+        order: 1;
+        .sectionPadding;
+        text-align: right;
     }
+
+    .pige-content {
+        align-items: stretch;
+        border:1px #ddd solid;
+        border-width:1px 0;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: flex-start;
+        order: 2;
+        overflow: scroll;
+        .sectionPadding;
+    }
+
+    .pige-footer {
+        flex-grow: 0;
+        order: 3;
+        .sectionPadding;
+        text-align: right;
+    }
+    
+}
+
+// preventing Angular flickering as app gets rendered
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+// hiding Bootstrap's default ui-selector icon
+.ui-select-container .caret {
+    display: none;
 }

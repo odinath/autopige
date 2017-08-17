@@ -1,0 +1,94 @@
+<span ng-if="!$appCtrl.isUserLoggedIn">
+    <button type="button" class="btn btn-primary"
+            ng-disabled="!($appCtrl.areRequiredFieldsFilledIn() && !$appCtrl.isCurrentUserAlreadyRegistered())"
+            ng-click="$appCtrl.onSignIn()">
+        {{ "button.sign.in" | translate }}
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-primary"
+            ng-click="$appCtrl.onSignUp()"
+            ng-disabled="!($appCtrl.areRequiredFieldsFilledIn() && $appCtrl.isCurrentUserAlreadyRegistered())">
+        {{ "button.sign.up" | translate }}
+        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
+    </button>
+</span>
+
+<div  ng-if="$appCtrl.viewGuestIsDisplayed()">
+
+    <!-- admin actions -->
+    <span ng-if="$appCtrl.currentUser.isAdmin">
+
+        <button type="button" class="btn btn-primary"
+            ng-click="$appCtrl.onEditPigeSettings()">
+            {{ "button.edit.pige" | translate }}
+            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+        </button>
+
+        |
+
+    </span>
+
+    <!-- default user actions -->
+    <button type="button" class="btn btn-primary"
+            ng-click="$appCtrl.onEditGuest()"
+            ng-disabled="$appCtrl.settings.isPigeActivated">
+        {{ "button.edit.user" | translate }}
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-primary"
+            ng-click="$appCtrl.onPigeGuest()"
+            ng-if="!$appCtrl.settings.autoPige"
+            ng-disabled="!$appCtrl.settings.isPigeActivated || $appCtrl.currentUser.pigedGuest !== ''">
+        {{ "button.trigger.pige" | translate }}
+        <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-success"
+            ng-click="$appCtrl.onAutoPige()"
+            ng-if="$appCtrl.settings.isPigeActivated && $appCtrl.settings.autoPige">
+        {{ "button.trigger.pige.auto" | translate }}
+        <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+    </button>
+
+</div>
+
+<!-- edit user -->
+<div ng-if="$appCtrl.isEditUserActive()">
+    <button type="button" class="btn btn-warning"
+            ng-click="$appCtrl.onCancel()">
+        {{ "button.cancel" | translate }}
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-danger"
+            ng-click="$appCtrl.onRemoveGuest()">
+        {{ "button.remove.user" | translate }}
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-default"
+            ng-class="{'btn-success': !$appCtrl.isSaveUserDisabled() }"
+            ng-click="$appCtrl.onSaveUser()"
+            ng-disabled="$appCtrl.isSaveUserDisabled()">
+        {{ "button.save.user" | translate }}
+        <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+    </button>
+</div>
+
+<!-- edit settings -->
+<div ng-if="$appCtrl.isEditSettingsActive()">
+    <button type="button" class="btn btn-warning"
+            ng-click="$appCtrl.onCancel()">
+        {{ "button.cancel" | translate }}
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-danger"
+            ng-click="$appCtrl.onResetPige()">
+        {{ "button.reset.pige" | translate }}
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-default"
+            ng-class="{'btn-success': !$appCtrl.isSaveSettingsDisabled() }"
+            ng-click="$appCtrl.onSaveSettings()"
+            ng-disabled="$appCtrl.isSaveSettingsDisabled()">
+        {{ "button.save.settings" | translate }}
+        <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+    </button>
+</div>

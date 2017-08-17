@@ -2,169 +2,21 @@
 <html ng-app="app">
 
     <head>
-        
-        <script src="node_modules/jquery/dist/jquery.min.js"></script>
-        <script src="node_modules/moment/min/moment.min.js"></script>
-        <script src="node_modules/angular/angular.min.js"></script>
-        <script src="node_modules/angular-bootstrap-toggle/dist/angular-bootstrap-toggle.min.js"></script>
-        <script src="node_modules/angular-route/angular-route.min.js"></script>
-        <script src="node_modules/angular-sanitize/angular-sanitize.min.js"></script>
-        <script src="node_modules/angular-translate/dist/angular-translate.min.js"></script>
-        <script src="node_modules/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js"></script>        
-        <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js"></script>
-        <script src="node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
-        <script src="node_modules/lodash/lodash.min.js"></script>
-        <script src="node_modules/ui-select/dist/select.min.js"></script>
-        <script src="angular/components/pigeForm/pigeFormModule.js"></script>
-        <script src="angular/components/pigeSettings/pigeSettingsModule.js"></script>
-        <script src="angular/services/dataServiceModule.js"></script>
-        <script src="angular/app.js"></script>
-        
+        <script src="dist/concat.js"></script>
         <link rel="stylesheet" href="dist/concat.css">
-        <link rel="stylesheet" href="node_modules/angular-bootstrap-toggle/dist/angular-bootstrap-toggle.min.css">
-        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
-        <link rel="stylesheet" href="node_modules/ui-select/dist/select.min.css">
-        
     </head>
 
     <body>
         
         <div ng-controller="appController as $appCtrl">
 
-                <div class="pige-header lessPadding">
-                    
-                    {{$appCtrl.guests}}
-                    
-                    <button type="button" class="btn btn-default"
-                            ng-click="$appCtrl.onSwitchLanguage()">
-                        {{ "button.translate" | translate }}
-                        <span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
-                    </button>
+            <div class="pige-header" ng-include="'angular/include/header.html'"></div>
 
-                    <button type="button" class="btn btn-default"
-                            ng-click="$appCtrl.onLogout()"
-                            ng-disabled="!$appCtrl.isUserLoggedIn">
-                        {{ "button.logout" | translate }}
-                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-                    </button>
+            <div class="pige-content" ng-view></div>
 
-                </div>
+            <div class="pige-footer" ng-include="'angular/include/footer.html'"></div>
 
-                <div class="pige-content lessPadding" ng-view></div>
-
-                <div class="pige-footer lessPadding">
-                    
-                    <span ng-if="!$appCtrl.isUserLoggedIn">
-                        <button type="button" class="btn btn-default"
-                                ng-class="{ 'btn-primary': ($appCtrl.areRequiredFieldsFilledIn() && !$appCtrl.isCurrentUserAlreadyRegistered())}"
-                                ng-disabled="!($appCtrl.areRequiredFieldsFilledIn() && !$appCtrl.isCurrentUserAlreadyRegistered())"
-                                ng-click="$appCtrl.onSignIn()">
-                            {{ "button.sign.in" | translate }}
-                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                        </button>
-                        <button type="button" class="btn btn-default"
-                                ng-class="{ 'btn-primary': ($appCtrl.areRequiredFieldsFilledIn() && $appCtrl.isCurrentUserAlreadyRegistered())}"
-                                ng-disabled="!($appCtrl.areRequiredFieldsFilledIn() && $appCtrl.isCurrentUserAlreadyRegistered())"
-                                ng-click="$appCtrl.onSignUp()">
-                            {{ "button.sign.up" | translate }}
-                            <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
-                        </button>
-                    </span>
-                                
-                    <div  ng-if="$appCtrl.viewGuestIsDisplayed()">
-
-                        <span ng-if="$appCtrl.currentUser.isAdmin">
-                            
-                            <button type="button" class="btn btn-default"
-                                ng-click="$appCtrl.onEditPigeSettings()">
-                                {{ "button.edit.pige" | translate }}
-                                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-                            </button>
-
-                            <button type="button" class="btn btn-primary"
-                                    ng-click="$appCtrl.onAutoPige()"
-                                    ng-if="!$appCtrl.settings.autoPige && !$appCtrl.settings.pigeSchedule">
-                                {{ "button.start.pige" | translate }}
-                                <span class="glyphicon glyphicon-flag" aria-hidden="true"></span>
-                            </button>
-
-                            <button type="button" class="btn btn-primary"
-                                    ng-click="$appCtrl.onAutoPige()"
-                                    ng-if="$appCtrl.settings.autoPige">
-                                {{ "button.trigger.pige.auto" | translate }}
-                                <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
-                            </button>
-                            
-                            |
-
-                        </span>
-                        
-                        <button type="button" class="btn btn-default"
-                                ng-click="$appCtrl.onPigeGuest()"
-                                ng-if="$appCtrl.isPigeStarted">
-                            {{ "button.trigger.pige" | translate }}
-                            <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span>
-                        </button>
-
-                        <button type="button" class="btn btn-danger"
-                                ng-click="$appCtrl.onRemoveGuest()">
-                            {{ "button.remove.user" | translate }}
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                        </button>
-                        
-                        <button type="button" class="btn btn-default"
-                                ng-click="$appCtrl.onEditGuest()">
-                            {{ "button.edit.user" | translate }}
-                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                        </button>
-
-                        
-                    </div>
-                    
-                    <!-- edit user -->
-                    <div ng-if="$appCtrl.isEditUserActive()">
-                        <button type="button" class="btn btn-warning"
-                                ng-click="$appCtrl.onCancel()">
-                            {{ "button.cancel" | translate }}
-                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                        </button>
-                        <button type="button" class="btn btn-danger"
-                                ng-click="$appCtrl.onRemoveGuest()">
-                            {{ "button.remove.user" | translate }}
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                        </button>
-                        <button type="button" class="btn btn-success"
-                                ng-click="$appCtrl.onSaveUser()"
-                                ng-disabled="$appCtrl.isSaveUserDisabled()">
-                            {{ "button.save" | translate }}
-                            <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                    
-                    <!-- edit settings -->
-                    <div ng-if="$appCtrl.isEditSettingsActive()">
-                        <button type="button" class="btn btn-warning"
-                                ng-click="$appCtrl.onCancel()">
-                            {{ "button.cancel" | translate }}
-                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                        </button>
-                        <button type="button" class="btn btn-danger"
-                                ng-click="$appCtrl.onResetPige()">
-                            {{ "button.reset.pige" | translate }}
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                        </button>
-                        <button type="button" class="btn btn-success"
-                                ng-click="$appCtrl.onSaveSettings()"
-                                ng-disabled="$appCtrl.isSaveSettingsDisabled()">
-                            {{ "button.save" | translate }}
-                            <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-                        </button>
-                    </div>
-
-                </div>
-
-            </div>
+        </div>
 
     </body>
     

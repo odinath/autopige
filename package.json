@@ -5,6 +5,7 @@
     "angular-sanitize": "^1.6.5",
     "angular-translate": "^2.15.2",
     "angular-translate-loader-static-files": "^2.15.2",
+    "bootstrap-table": "^1.11.2",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "grunt": "^1.0.1",
     "grunt-angular-templates": "^1.1.0",

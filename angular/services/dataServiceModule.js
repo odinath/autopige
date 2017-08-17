@@ -8,9 +8,10 @@
         
         // todo: make it an external json file read through BLOB + File
         var _initialSettings = {
-             autoPige: false,
-             nbAdminMax: 1,
-             scheduleDate: ""
+            autoPige: true,
+            nbAdminMax: 1,
+            isPigeActivated: true/*,
+            scheduledDateTime: ""*/
         };
         
         var _settings = {};
@@ -25,8 +26,101 @@
             },
             pigedGuest: ""
         };
+        
+//        var _currentUser = {
+//            conjoint: "Nathalie Dufour",
+//            isAdmin: true,
+//            name: {
+//                first: "Odin",
+//                full: "Odin Marole",
+//                last: "Marole",
+//            },
+//            pigedGuest: ""
+//        };
 
         var _guests = [];
+//        var _guests = [
+//            {
+//                conjoint: "Nathalie Dufour",
+//                isAdmin: true,
+//                name: {
+//                    first: "Odin",
+//                    full: "Odin Marole",
+//                    last: "Marole",
+//                },
+//                pigedGuest: ""
+//            },
+//            {
+//                conjoint: "Odin Marole",
+//                isAdmin: false,
+//                name: {
+//                    first: "Nathalie",
+//                    full: "Nathalie Dufour",
+//                    last: "Dufour",
+//                },
+//                pigedGuest: ""
+//            },
+//            {
+//                conjoint: "",
+//                isAdmin: true,
+//                name: {
+//                    first: "Céline",
+//                    full: "Céline Chipoy",
+//                    last: "Chipoy",
+//                },
+//                pigedGuest: ""
+//            },
+//            {
+//                conjoint: "",
+//                isAdmin: false,
+//                name: {
+//                    first: "Cédric",
+//                    full: "Cédric Marole",
+//                    last: "Marole",
+//                },
+//                pigedGuest: ""
+//            },
+//            {
+//                conjoint: "",
+//                isAdmin: false,
+//                name: {
+//                    first: "Agathe",
+//                    full: "Agathe Baus",
+//                    last: "Baus",
+//                },
+//                pigedGuest: ""
+//            },
+//            {
+//                conjoint: "",
+//                isAdmin: false,
+//                name: {
+//                    first: "Richard",
+//                    full: "Richard Laplante",
+//                    last: "Laplante",
+//                },
+//                pigedGuest: ""
+//            },
+//            {
+//                conjoint: "",
+//                isAdmin: false,
+//                name: {
+//                    first: "Suzy",
+//                    full: "Suzy Cue",
+//                    last: "Cue",
+//                },
+//                pigedGuest: ""
+//            },
+//            {
+//                conjoint: "",
+//                isAdmin: false,
+//                name: {
+//                    first: "Josiane",
+//                    full: "Josiane Balasko",
+//                    last: "Balasko",
+//                },
+//                pigedGuest: ""
+//            }
+//        ];
         
         /* -------------
         [ current user ]
@@ -76,6 +170,10 @@
 
         };
         
+        this.applyGuestPige = function(currentUser, pigedGuestFullName) {
+            _guests[_.findIndex(_guests, currentUser)].pigedGuest = pigedGuestFullName;
+        };
+        
         // remove
         this.removeGuest = function(currentUser) {
             // removing guest from guest list
@@ -108,14 +206,14 @@
         this.getGuestDataFromName = function(first, last) {
             return _guests.find(function(guest){
                 return (guest.name.full === first + " " + last);
-            }.bind(this))
+            }.bind(this));
         };
         
         // get conjoint from name
         this.getConjointDataFromName = function(first, last) {
             return _guests.find(function(guest){
                 return (guest.conjoint === first + " " + last);
-            }.bind(this))
+            }.bind(this));
         };
 
         /* ---------
@@ -157,6 +255,6 @@
             }.bind(this));
         };
         
-    })
+    });
     
 })();

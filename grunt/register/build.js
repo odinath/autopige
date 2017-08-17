@@ -3,10 +3,17 @@
     module.exports = function (grunt) {
         grunt.registerTask("build", [
             "clean:beforeBuild",
+            "jshint",
+            "concat:js",
+//            "uglify",
+//            "lessHint",
+            "less",
+            "concat:css",
+//            "minify",
 //            "ngtemplates",
-//            "concat:js", "jsHint", "minifyJS",
-            "concat:less", "lessHint", "less"
-            "clean:afterBuild"
+            "clean:afterBuild",
+//            "ngdocs"
+            
         ]);
     };
 })();

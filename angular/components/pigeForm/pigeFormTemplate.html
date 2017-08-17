@@ -1,11 +1,11 @@
 <div class="container">
     <form>
         <div class="form-group row">
-            <input class="form-control" id="name.first" placeholder="{{ 'label.name.first' | translate }}" title="{{ 'to.do' | translate }}" value="{ $pigeFormCtrl.currentUser.name.first }" type="text" required autofocus ng-model="$pigeFormCtrl.currentUser.name.first"
+            <input class="form-control" id="name.first" placeholder="{{ 'label.name.first' | translate }} *" title="{{ 'field.required' | translate }}" value="{ $pigeFormCtrl.currentUser.name.first }" type="text" required="true" autofocus ng-model="$pigeFormCtrl.currentUser.name.first"
             ng-change="$pigeFormCtrl.updateCurrentUserData()">
         </div>
         <div class="form-group row">
-            <input class="form-control" id="name.first" placeholder="{{ 'label.name.last' | translate }}" title="{{ 'to.do' | translate }}" value="{{ $pigeFormCtrl.currentUser.name.last }}" type="text" required   ng-model="$pigeFormCtrl.currentUser.name.last" ng-change="$pigeFormCtrl.updateCurrentUserData()">
+            <input class="form-control" id="name.first" placeholder="{{ 'label.name.last' | translate }} *" title="{{ 'field.required' | translate }}" value="{{ $pigeFormCtrl.currentUser.name.last }}" type="text" required="true" ng-model="$pigeFormCtrl.currentUser.name.last" ng-change="$pigeFormCtrl.updateCurrentUserData()">
         </div>
         <div class="form-group row">
             <ui-select ng-model="$pigeFormCtrl.currentUser.conjoint"
