@@ -1,6 +1,14 @@
 // mixin
 .sectionPadding {
-    padding: 20px;
+    padding: 20px 15px;
+}
+
+.buttonsAlignment {
+    text-align: right;
+}
+
+.greyBackground {
+    background-color: #eee;
 }
 
 html,
@@ -26,9 +34,10 @@ div[ng-controller] {
 
     .pige-header {
         flex-grow: 0;
+        .greyBackground;
         order: 1;
         .sectionPadding;
-        text-align: right;
+        .buttonsAlignment;
     }
 
     .pige-content {
@@ -42,13 +51,19 @@ div[ng-controller] {
         order: 2;
         overflow: scroll;
         .sectionPadding;
+        
+        pige-form {
+            padding: 20px;
+        }
+        
     }
 
     .pige-footer {
         flex-grow: 0;
+        .greyBackground;
         order: 3;
         .sectionPadding;
-        text-align: right;
+        .buttonsAlignment;
     }
     
 }

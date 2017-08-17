@@ -20,7 +20,13 @@
 /*# sourceMappingURL=select.min.css.map */
 
 .sectionPadding {
-  padding: 20px;
+  padding: 20px 15px;
+}
+.buttonsAlignment {
+  text-align: right;
+}
+.greyBackground {
+  background-color: #eee;
 }
 html,
 body,
@@ -35,8 +41,9 @@ div[ng-controller] {
 }
 div[ng-controller] .pige-header {
   flex-grow: 0;
+  background-color: #eee;
   order: 1;
-  padding: 20px;
+  padding: 20px 15px;
   text-align: right;
 }
 div[ng-controller] .pige-content {
@@ -49,12 +56,16 @@ div[ng-controller] .pige-content {
   justify-content: flex-start;
   order: 2;
   overflow: scroll;
+  padding: 20px 15px;
+}
+div[ng-controller] .pige-content pige-form {
   padding: 20px;
 }
 div[ng-controller] .pige-footer {
   flex-grow: 0;
+  background-color: #eee;
   order: 3;
-  padding: 20px;
+  padding: 20px 15px;
   text-align: right;
 }
 [ng\:cloak],

@@ -1,12 +1,14 @@
-<button type="button" class="btn btn-primary"
-        ng-click="$appCtrl.onSwitchLanguage()">
-    {{ "button.translate" | translate }}
-    <span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
-</button>
+<div class="container">
+    <button type="button" class="btn btn-primary"
+            ng-click="$appCtrl.onSwitchLanguage()">
+        {{ "button.translate" | translate }}
+        <span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+    </button>
 
-<button type="button" class="btn btn-primary"
-        ng-click="$appCtrl.onLogout()"
-        ng-disabled="!$appCtrl.isUserLoggedIn">
-    {{ "button.logout" | translate }}
-    <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-</button>
+    <button type="button" class="btn btn-primary"
+            ng-click="$appCtrl.onLogout()"
+            ng-disabled="!$appCtrl.isUserLoggedIn">
+        {{ "button.logout" | translate }}
+        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+    </button>
+</div>
