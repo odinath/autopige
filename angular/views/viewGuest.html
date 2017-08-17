@@ -4,33 +4,69 @@
         {{ "title.view" | translate: $appCtrl.currentUser.name }}
     </h1>
     
-    <div ng-if="!$appCtrl.settings.isPigeActivated">
+    <div ng-if="$appCtrl.currentUser.pigedGuest !== ''">
         <p>
-            {{ "message.pige.not.activated" | translate }}
-        </p>
-        <p ng-if="$appCtrl.currentUser.isAdmin">
-            {{ "message.pige.not.activated.admin" | translate }}
-        </p>
-    </div>
-    
-    <div ng-if="$appCtrl.settings.isPigeActivated">
-        <p>
-            {{ "message.pige.activated" | translate }}
-        </p>
-        <p ng-if="$appCtrl.settings.autoPige">
-            <span ng-if="!$appCtrl.currentUser.isAdmin">
-                {{ "message.pige.auto.guest" | translate }}
-            </span>
-            <span ng-if="$appCtrl.currentUser.isAdmin">
-                {{ "message.pige.auto.admin" | translate }}
-            </span>
-        </p>
-        <p ng-if="!$appCtrl.settings.autoPige && $appCtrl.currentUser.pigedGuest === ''">
-            {{ "message.pige.not.triggered" | translate }}
-        </p>
-        <p ng-if="$appCtrl.currentUser.pigedGuest !== ''">
             {{ "message.pige.triggered" | translate: $appCtrl.currentUser }}
         </p>
     </div>
     
+    <div ng-if="$appCtrl.currentUser.pigedGuest === ''">
+
+        <span ng-if="!$appCtrl.settings.isPigeActivated">
+            <p>
+                {{ "message.pige.not.activated" | translate }}
+            </p>
+            <p ng-if="$appCtrl.currentUser.isAdmin">
+                {{ "message.pige.not.activated.admin" | translate }}
+            </p>
+        </span>
+
+        <div ng-if="$appCtrl.settings.isPigeActivated">
+            <p>
+                {{ "message.pige.activated" | translate }}
+            </p>
+            <p ng-if="$appCtrl.settings.autoPige">
+                <span ng-if="!$appCtrl.currentUser.isAdmin">
+                    {{ "message.pige.auto.guest" | translate }}
+                </span>
+                <span ng-if="$appCtrl.currentUser.isAdmin">
+                    {{ "message.pige.auto.admin" | translate }}
+                </span>
+            </p>
+            <p ng-if="!$appCtrl.settings.autoPige">
+                {{ "message.pige.not.triggered" | translate }}
+            </p>
+
+        </div>            
+        
+    </div>
+    
+    <div ng-if="$appCtrl.currentUser.isAdmin">
+
+        <h3>
+            {{ "title.guests.list" | translate }}
+        </h3>
+        
+        <table st-table="$appCtrl.guests" class="table table-striped">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Conjoint</th>
+                <th>Is Admin</th>
+                <th>Piged Guest</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="guest in $appCtrl.guests">
+                <td>{{guest.name.full}}</td>
+                <td>{{guest.conjoint}}</td>
+                <td>{{guest.isAdmin}}</td>
+                <td>{{guest.pigedGuest}}</td>
+            </tr>
+            </tbody>
+        </table>
+        
+        
+    </div>
+
 </div>

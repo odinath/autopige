@@ -8,7 +8,8 @@
         "ngSanitize",
         "pascalprecht.translate",
         "pigeFormModule",
-        "pigeSettingsModule"
+        "pigeSettingsModule",
+        "smart-table"
     ])
 
     .config(['$locationProvider', function($locationProvider) {
@@ -43,8 +44,9 @@
 
     .controller("appController", function(
          $location,
-          $routeParams,
+         $routeParams,
          $sanitize,
+         $scope, 
          $translate,
          dataService
     ){
@@ -60,7 +62,9 @@
 
             // set app to initial state
             this.onLogout();
-                        
+            
+            $scope.guestsTableData = this.guests;
+                                    
         };
         
         this.isCurrentUserAlreadyRegistered = function() {
@@ -135,9 +139,15 @@
         };
         
         this.isSaveUserDisabled = function() {
-            return (JSON.stringify(this.currentUser) === JSON.stringify(this.initialCurrentUser)) ||
-                (!this.currentUser.name.first || !this.currentUser.name.last) ||
-                dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last);
+            return (
+                JSON.stringify(this.currentUser) === JSON.stringify(this.initialCurrentUser) ||
+                !this.currentUser.name.first ||
+                !this.currentUser.name.last ||
+                (
+                    dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last) &&
+                    (this.currentUser.conjoint === this.initialCurrentUser.conjoint)
+                )
+            );
         };
         
         // session
@@ -194,9 +204,10 @@
             var potentialPicks = _.map(this.guests, 'name.full');
 
             // removing names of all previously picked guests
-            potentialPicks = _.difference(potentialPicks, _.map(this.guests, 'pigedGuest')).filter(function(pigedGuest){
-                return pigedGuest !== "";
-            });
+//            potentialPicks = _.difference(potentialPicks, _.map(this.guests, 'pigedGuest')).filter(function(pigedGuest){
+//                return pigedGuest !== "";
+//            });
+            potentialPicks = _.difference(potentialPicks, _.map(this.guests, 'pigedGuest'));
 
             // removing name of current user (might have been removed already)
             var index = potentialPicks.indexOf(guest.name.full);
@@ -235,26 +246,28 @@
             this.resetPigedGuests();
             
             var getPigedGuestInList = function() {
-                return _.map(this.guests, "pigedGuest").filter(function(pigedGuest){
-                    return pigedGuest !== "";
-                });
+                return _.map(this.guests, "pigedGuest");
             }.bind(this);
             
             var getConjointsStillInTheList = function(index) {
+
                 // getting names of all remaining guests
                 var guestsStillInTheList = this.guests.slice(0, i + 1);
+
                 // removing names of guests already picked
                 var namesOfGuestsStillInTheList = _.difference(_.map(guestsStillInTheList, "name.full"), getPigedGuestInList());
+
                 // returning names of conjoints still in the list
                 return _.intersection(namesOfGuestsStillInTheList, _.map(guestsStillInTheList, "conjoint"));   
+            
             }.bind(this);
             
             // applying a selection to each guest
             for (var i = (this.guests.length - 1); i >= 0; i--) {
                 
                 // we want to avoid having conjoints as last two guests with no association
-                if (i < 5 && getConjointsStillInTheList(i).length >= 2) {
-                    this.guests[i].pigedGuest = getConjointsStillInTheList(i)[Math.round(Math.random())];
+                if (i < 4 && getConjointsStillInTheList(i).length !== 0) {
+                    this.guests[i].pigedGuest = getConjointsStillInTheList(i)[Math.floor(Math.random()) * (getConjointsStillInTheList(i).length - 1)];
                     console.log(this.guests[i].name.full + " >> " + this.guests[i].pigedGuest);
                 }
                 // applying basic guest selection

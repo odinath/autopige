@@ -22,6 +22,7 @@ module.exports = function(grunt) {
                 "node_modules/angular-bootstrap-toggle/dist/angular-bootstrap-toggle.min.js",
                 "node_modules/angular-route/angular-route.min.js",
                 "node_modules/angular-sanitize/angular-sanitize.min.js",
+                "node_modules/angular-smart-table/dist/smart-table.min.js",
                 "node_modules/angular-translate/dist/angular-translate.min.js",
                 "node_modules/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js",
                 "node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js",
