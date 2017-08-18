@@ -12,7 +12,7 @@
             <ui-select-match placeholder="{{ $pigeFormCtrl.getUISelectPlaceholder() }}" allow-clear="true">
                 <span ng-bind="$pigeFormCtrl.currentUser.conjoint"></span>
             </ui-select-match>
-            <ui-select-choices repeat="conjoint in ($pigeFormCtrl.conjoints | filter: $select.search) track by conjoint"
+            <ui-select-choices repeat="conjoint in ($pigeFormCtrl.conjoints.sort() | filter: $select.search) track by conjoint"
                                refresh="$pigeFormCtrl.refreshResults($select)" refresh-delay="0">
                 <span ng-bind="conjoint"></span>
             </ui-select-choices>

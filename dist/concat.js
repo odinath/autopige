@@ -7973,12 +7973,8 @@ angular.module("pigeFormModule", [
     
     this.$onInit = function() {
 
-        // guests
-        this.guests = dataService.getGuests();
-        
         // conjoints
         this.resetConjointsList();
-        this.conjointSelectorDisabled = false;
         
     };
 
@@ -7990,10 +7986,12 @@ angular.module("pigeFormModule", [
         }
     };
     
+    // updating current user data
     this.updateCurrentUserData = function() {
         
         this.trimCurrentUserName();
         
+        // getting data related to the current user and his/her associated conjoint
         var guestData = dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last);
         var conjointData = dataService.getConjointDataFromName(this.currentUser.name.first, this.currentUser.name.last);
 
@@ -8006,27 +8004,55 @@ angular.module("pigeFormModule", [
         // the name of this user is already associated with a guest, we display the name of the conjoint
         else if (conjointData) {
             this.currentUser.conjoint = conjointData.name.full;
-            this.conjointSelectorDisabled = true;
         }
         
         // this user is not registered yet, we display default input values
         else if (!this.isEditUserActive()) {
-            this.conjointSelectorDisabled = false;
             this.currentUser.conjoint = "";
             this.currentUser.isAdmin = false;
         }
         
     };
     
+    // resetting list of conjoints
+    this.resetConjointsList = function() {
+        // getting full names of all guests with no associated conjoint
+        this.conjoints = _.map(
+            this.guests.filter(function(guest){
+                return guest.conjoint === "";
+            }),
+            "name.full"
+        );
+        // removing name of current user
+        this.conjoints.splice(this.conjoints.indexOf(this.currentUser.name.full), 0);
+    };
+    
+    this.isEditUserActive = function() {
+        return (this.mode.indexOf("/edit/") === 0);
+    };
+    
+    this.hasNbAdminMaxBeingReached = function() {
+        return (dataService.getNumberOfRegisteredAdmin() >= this.settings.nbAdminMax);
+    };
+
+    // conjoint ui-select
+    
+    // is disabled
+    this.isConjointSelectorDisabled = function() {
+        return !this.isEditUserActive() && dataService.isCurrentUserAlreadyRegistered(this.currentUser.name.first, this.currentUser.name.last);
+    };
+    
+    // dynamic placeholder for conjoint ui-select
     this.getUISelectPlaceholder = function() {
         return (this.currentUser.conjoint !== null && this.currentUser.conjoint !== "")?
             this.currentUser.conjoint:
             $translate.instant("label.name.conjoint");
     };
     
+    // refresh the list of conjoints
     this.refreshResults = function($select){
         var search = $select.search,
-            list = angular.copy($select.items);        
+            list = angular.copy($select.items);
         if (!search) {
             $select.items = list;
         }
@@ -8036,31 +8062,6 @@ angular.module("pigeFormModule", [
             }
             $select.selected = search;
         }
-    };
-    
-    this.resetConjointsList = function() {
-        // getting full names of all guests with no associated conjoint
-        this.conjoints = _.map(
-            this.guests.filter(function(guest){
-                return guest.conjoint === "";
-            }),
-            "name.full"
-        );
-        this.conjoints.splice(this.conjoints.indexOf(this.currentUser.name.full), 0);
-    };
-    
-    this.isEditUserActive = function() {
-        return (this.mode.indexOf("/edit/") === 0);
-    };
-    
-    this.isConjointSelectorDisabled = function() {
-        return !this.isEditUserActive() && (this.conjointSelectorDisabled || dataService.isCurrentUserAlreadyRegistered(
-            this.currentUser.name.first, this.currentUser.name.last
-        ));
-    };
-    
-    this.hasNbAdminMaxBeingReached = function() {
-        return (dataService.getNumberOfRegisteredAdmin() >= this.settings.nbAdminMax);
     };
 
     // admin checkbox
@@ -8261,21 +8262,25 @@ angular.module("pigeSettingsModule", [
             }
             
             // replacing guest in guest list with new value
-            _guests.splice(_.findIndex(_guests, initialCurrentUser), 1, currentUser);
+            _guests.splice(_.findIndex(_guests, initialCurrentUser), currentUser);
             
             // updating any related guest association
             var associatedConjoint = this.getAssociatedConjoint(initialCurrentUser.name.first, initialCurrentUser.name.last);
             if (associatedConjoint) {
-                associatedConjoint.conjoint = (currentUser.conjoint === "")? "" : currentUser.name.full;
+                associatedConjoint.conjoint =
+                    (currentUser.conjoint === "" || associatedConjoint.name.full !== currentUser.conjoint)?
+                        "" :
+                        currentUser.name.full;
             }
-
-            // applying any newly affected guest association
             else if (currentUser.conjoint !== "") {
+                
+                // reflecting guest association to the other conjoint
                 var splitConjointName = currentUser.conjoint.split(" ");
                 var conjoinedGuest = this.getGuestDataFromName(splitConjointName[0], splitConjointName[1]);
                 if (conjoinedGuest) {
                     conjoinedGuest.conjoint = currentUser.name.full;
-                }                           
+                }
+                
             }
 
         };
@@ -8412,7 +8417,7 @@ angular.module("pigeSettingsModule", [
             this.setBothSettings();
             
             // guests
-            this.setGuests();
+            this.initializeGuests();
             
             // current user
             this.resetBothCurrentUser();
@@ -8469,11 +8474,14 @@ angular.module("pigeSettingsModule", [
         [ guests ]
         ------- */
         
+        this.initializeGuests = function() {
+            dataService.fetchGuests().then(function(guests){
+                this.guests = angular.copy(guests);
+            }.bind(this));            
+        };
+        
         this.setGuests = function() {
             this.guests = dataService.getGuests();
-//            dataService.fetchGuests().then(function(guests){
-//                this.guests = guests;    
-//            }.bind(this));
         };
         
         this.resetGuests = function() {
@@ -8499,6 +8507,7 @@ angular.module("pigeSettingsModule", [
         this.onSaveUser = function() {
             this.currentUser.name.full = this.currentUser.name.first + " " + this.currentUser.name.last;
             dataService.updateGuest(this.initialCurrentUser, angular.copy(this.currentUser));
+            this.setGuests();
             this.resetInitialCurrentUser();
         };
         
@@ -8528,13 +8537,13 @@ angular.module("pigeSettingsModule", [
         
         this.onSignUp = function() {
             // updating user name values
-            this.currentUser.name.full = this.currentUser.name.first + ' ' + this.currentUser.name.last;
+            this.currentUser.name.full = this.currentUser.name.first + " " + this.currentUser.name.last;
             for (var key in this.currentUser.name){
                 this.currentUser.name[key] = this.currentUser.name[key].trim();
             }
             // adding user to dataService
             dataService.addGuest(angular.copy(this.currentUser));
-            this.guests.push(angular.copy(this.currentUser));
+//            this.guests.push(angular.copy(this.currentUser));
             // flagging the user as logged in
             this.isUserLoggedIn = true;
             // todo: tobe removed once file upload has been implemented
@@ -8655,7 +8664,8 @@ angular.module("pigeSettingsModule", [
             this.guests.forEach(function(guest){
                 guest.pigedGuest = "";
             });
-        };        
+        };
+        
         // settings
 
         this.onEditPigeSettings = function() {

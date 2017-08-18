@@ -120,21 +120,25 @@
             }
             
             // replacing guest in guest list with new value
-            _guests.splice(_.findIndex(_guests, initialCurrentUser), 1, currentUser);
+            _guests.splice(_.findIndex(_guests, initialCurrentUser), currentUser);
             
             // updating any related guest association
             var associatedConjoint = this.getAssociatedConjoint(initialCurrentUser.name.first, initialCurrentUser.name.last);
             if (associatedConjoint) {
-                associatedConjoint.conjoint = (currentUser.conjoint === "")? "" : currentUser.name.full;
+                associatedConjoint.conjoint =
+                    (currentUser.conjoint === "" || associatedConjoint.name.full !== currentUser.conjoint)?
+                        "" :
+                        currentUser.name.full;
             }
-
-            // applying any newly affected guest association
             else if (currentUser.conjoint !== "") {
+                
+                // reflecting guest association to the other conjoint
                 var splitConjointName = currentUser.conjoint.split(" ");
                 var conjoinedGuest = this.getGuestDataFromName(splitConjointName[0], splitConjointName[1]);
                 if (conjoinedGuest) {
                     conjoinedGuest.conjoint = currentUser.name.full;
-                }                           
+                }
+                
             }
 
         };

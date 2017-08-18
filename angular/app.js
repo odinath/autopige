@@ -57,7 +57,7 @@
             this.setBothSettings();
             
             // guests
-            this.setGuests();
+            this.initializeGuests();
             
             // current user
             this.resetBothCurrentUser();
@@ -114,11 +114,14 @@
         [ guests ]
         ------- */
         
+        this.initializeGuests = function() {
+            dataService.fetchGuests().then(function(guests){
+                this.guests = angular.copy(guests);
+            }.bind(this));            
+        };
+        
         this.setGuests = function() {
             this.guests = dataService.getGuests();
-//            dataService.fetchGuests().then(function(guests){
-//                this.guests = guests;    
-//            }.bind(this));
         };
         
         this.resetGuests = function() {
@@ -144,6 +147,7 @@
         this.onSaveUser = function() {
             this.currentUser.name.full = this.currentUser.name.first + " " + this.currentUser.name.last;
             dataService.updateGuest(this.initialCurrentUser, angular.copy(this.currentUser));
+            this.setGuests();
             this.resetInitialCurrentUser();
         };
         
@@ -173,13 +177,13 @@
         
         this.onSignUp = function() {
             // updating user name values
-            this.currentUser.name.full = this.currentUser.name.first + ' ' + this.currentUser.name.last;
+            this.currentUser.name.full = this.currentUser.name.first + " " + this.currentUser.name.last;
             for (var key in this.currentUser.name){
                 this.currentUser.name[key] = this.currentUser.name[key].trim();
             }
             // adding user to dataService
             dataService.addGuest(angular.copy(this.currentUser));
-            this.guests.push(angular.copy(this.currentUser));
+//            this.guests.push(angular.copy(this.currentUser));
             // flagging the user as logged in
             this.isUserLoggedIn = true;
             // todo: tobe removed once file upload has been implemented
@@ -300,7 +304,8 @@
             this.guests.forEach(function(guest){
                 guest.pigedGuest = "";
             });
-        };        
+        };
+        
         // settings
 
         this.onEditPigeSettings = function() {

@@ -57,7 +57,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="guest in $appCtrl.guests">
+            <tr ng-repeat="guest in $appCtrl.guests | orderBy: 'name.full'">
                 <td>{{guest.name.full}}</td>
                 <td>{{guest.conjoint}}</td>
                 <td>{{guest.isAdmin}}</td>

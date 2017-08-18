@@ -1,5 +1,5 @@
 {
-    "autoPige": true,
+    "autoPige": false,
     "nbAdminMax": 1,
-    "isPigeActivated": true
+    "isPigeActivated": false
 }
