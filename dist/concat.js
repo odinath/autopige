@@ -7974,19 +7974,10 @@ angular.module("pigeFormModule", [
     this.$onInit = function() {
 
         // conjoints
-        
         this.resetConjointsList();
-        
-        this.conjointSelectorDisabled = false;
-        
-        // settings
-        
-        this.settings = dataService.getSettings();
         
     };
 
-    this.isCurrentUserAlreadyRegistered = dataService.isCurrentUserAlreadyRegistered;
-    
     this.trimCurrentUserName = function() {
         for (var key in this.currentUser.name) {
             if (this.currentUser.name[key]) {
@@ -7995,10 +7986,12 @@ angular.module("pigeFormModule", [
         }
     };
     
+    // updating current user data
     this.updateCurrentUserData = function() {
         
         this.trimCurrentUserName();
         
+        // getting data related to the current user and his/her associated conjoint
         var guestData = dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last);
         var conjointData = dataService.getConjointDataFromName(this.currentUser.name.first, this.currentUser.name.last);
 
@@ -8011,27 +8004,55 @@ angular.module("pigeFormModule", [
         // the name of this user is already associated with a guest, we display the name of the conjoint
         else if (conjointData) {
             this.currentUser.conjoint = conjointData.name.full;
-            this.conjointSelectorDisabled = true;
         }
         
         // this user is not registered yet, we display default input values
         else if (!this.isEditUserActive()) {
-            this.conjointSelectorDisabled = false;
             this.currentUser.conjoint = "";
             this.currentUser.isAdmin = false;
         }
         
     };
     
+    // resetting list of conjoints
+    this.resetConjointsList = function() {
+        // getting full names of all guests with no associated conjoint
+        this.conjoints = _.map(
+            this.guests.filter(function(guest){
+                return guest.conjoint === "";
+            }),
+            "name.full"
+        );
+        // removing name of current user
+        this.conjoints.splice(this.conjoints.indexOf(this.currentUser.name.full), 0);
+    };
+    
+    this.isEditUserActive = function() {
+        return (this.mode.indexOf("/edit/") === 0);
+    };
+    
+    this.hasNbAdminMaxBeingReached = function() {
+        return (dataService.getNumberOfRegisteredAdmin() >= this.settings.nbAdminMax);
+    };
+
+    // conjoint ui-select
+    
+    // is disabled
+    this.isConjointSelectorDisabled = function() {
+        return !this.isEditUserActive() && dataService.isCurrentUserAlreadyRegistered(this.currentUser.name.first, this.currentUser.name.last);
+    };
+    
+    // dynamic placeholder for conjoint ui-select
     this.getUISelectPlaceholder = function() {
         return (this.currentUser.conjoint !== null && this.currentUser.conjoint !== "")?
             this.currentUser.conjoint:
             $translate.instant("label.name.conjoint");
     };
     
+    // refresh the list of conjoints
     this.refreshResults = function($select){
         var search = $select.search,
-            list = angular.copy($select.items);        
+            list = angular.copy($select.items);
         if (!search) {
             $select.items = list;
         }
@@ -8042,29 +8063,6 @@ angular.module("pigeFormModule", [
             $select.selected = search;
         }
     };
-    
-    this.resetConjointsList = function() {
-        // getting full names of all guests with no associated conjoint
-        this.conjoints = _.map(
-            this.guests.filter(function(guest){
-                return guest.conjoint === "";
-            }),
-            "name.full"
-        );
-        this.conjoints.splice(this.conjoints.indexOf(this.currentUser.name.full), 1);
-    };
-    
-    this.isEditUserActive = function() {
-        return (this.mode.indexOf("/edit/") === 0);
-    };
-    
-    this.isConjointSelectorDisabled = function() {
-        return !this.isEditUserActive() && (this.conjointSelectorDisabled || this.isCurrentUserAlreadyRegistered());
-    };
-    
-    this.hasNbAdminMaxBeingReached = function() {
-        return (dataService.getNumberOfAdmin() === this.settings.nbAdminMax);
-    };
 
     // admin checkbox
     
@@ -8073,7 +8071,9 @@ angular.module("pigeFormModule", [
             return this.hasNbAdminMaxBeingReached() && !this.currentUser.isAdmin;
         }
         else {
-            return (this.hasNbAdminMaxBeingReached() || this.isCurrentUserAlreadyRegistered());
+            return (this.hasNbAdminMaxBeingReached() || dataService.isCurrentUserAlreadyRegistered(
+                this.currentUser.name.first, this.currentUser.name.last
+            ));
         }
     };
 
@@ -8093,7 +8093,8 @@ angular.module("pigeFormModule", [
     bindings: {
         currentUser: "=",
         guests: "<",
-        mode: "<"
+        mode: "<",
+        settings: "<"
     }
 });
 angular.module("pigeSettingsModule", [
@@ -8110,12 +8111,7 @@ angular.module("pigeSettingsModule", [
 
     this.$onInit = function() {
         
-        $(function () {
-            $('#datetimepicker').datetimepicker({
-                sideBySide: true,
-                minDate: new Date()
-            });
-        });
+        console.log(this.settings);
         
     };
     
@@ -8150,136 +8146,96 @@ angular.module("pigeSettingsModule", [
     
     angular.module("dataServiceModule", [])
 
-    .service('dataService', function() {
+    .service('dataService', function(
+        $http,
+        $q
+    ) {
+
+        /* ---------
+        [ settings ]
+        --------- */
         
-        // todo: make it an external json file read through BLOB + File
-        var _initialSettings = {
-            autoPige: true,
-            nbAdminMax: 1,
-            isPigeActivated: true/*,
-            scheduledDateTime: ""*/
-        };
-        
+        // initial
+
         var _settings = {};
         
-        var _currentUser = {
-            conjoint: "",
-            isAdmin: false,
-            name: {
-                first: "",
-                full: "",
-                last: "",
-            },
-            pigedGuest: ""
+        this.fetchSettings = function() {
+            return $http.get('data/settings.json')
+                .then(function onSuccess(response) {
+                    $q.defer().resolve();    
+                    return response.data;
+                })
+                .catch(function onError(response) {
+                    console.log(response);
+                });
+        };
+
+        this.resetSettings = function() {
+            this.fetchSettings().then(function(settings){
+                _settings = settings;
+            });            
         };
         
-//        var _currentUser = {
-//            conjoint: "Nathalie Dufour",
-//            isAdmin: true,
-//            name: {
-//                first: "Odin",
-//                full: "Odin Marole",
-//                last: "Marole",
-//            },
-//            pigedGuest: ""
-//        };
+        this.resetSettings();
 
-        var _guests = [];
+        this.getSettings = function() {
+            return _settings;
+        };
+
+        // current
         
-//        var _guests = [
-//            {
-//                conjoint: "Nathalie Dufour",
-//                isAdmin: true,
-//                name: {
-//                    first: "Odin",
-//                    full: "Odin Marole",
-//                    last: "Marole",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "Odin Marole",
-//                isAdmin: false,
-//                name: {
-//                    first: "Nathalie",
-//                    full: "Nathalie Dufour",
-//                    last: "Dufour",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: true,
-//                name: {
-//                    first: "Céline",
-//                    full: "Céline Chipoy",
-//                    last: "Chipoy",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Cédric",
-//                    full: "Cédric Marole",
-//                    last: "Marole",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Agathe",
-//                    full: "Agathe Baus",
-//                    last: "Baus",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Richard",
-//                    full: "Richard Laplante",
-//                    last: "Laplante",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Suzy",
-//                    full: "Suzy Cue",
-//                    last: "Cue",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Josiane",
-//                    full: "Josiane Balasko",
-//                    last: "Balasko",
-//                },
-//                pigedGuest: ""
-//            }
-//        ];
+        var _currentSettings = {};
+
+        this.resetCurrentSettings = function() {
+            _currentSettings = angular.copy(_settings);
+        };
+
+        this.resetCurrentSettings();
+
+        this.getCurrentSettings = function() {
+            return _settings;
+        };
         
-        /* -------------
-        [ current user ]
-        ------------- */
-        
-        this.getCurrentUser = function() {
-            return _currentUser;
+        // update
+        this.updateCurrentSettings = function(updatedSettings) {
+            _currentSettings = updatedSettings;
         };
         
         /* -------
         [ guests ]
         ------- */ 
+        
+        var _guests = [];
+        
+        this.fetchGuests = function() {
+            return $http.get('data/guests.json')
+                .then(function onSuccess(response) {
+                    $q.defer().resolve();    
+                    return response.data.guests;
+                })
+                .catch(function onError(response) {
+                    console.log(response);
+                });
+        };
+
+        this.fetchGuests().then(function(guests){
+            _guests = guests;
+        });
+
+        // upload
+//        this.uploadGuests = function() {
+//        };
+        
+        // get all guests
+        this.getGuests = function() {
+            return _guests;
+        };
+
+        // reset
+        this.resetGuests = function() {
+            _guests = [];
+//            this.uploadGuests();
+        };        
         
         // add
         this.addGuest = function(currentUser) {
@@ -8290,7 +8246,22 @@ angular.module("pigeSettingsModule", [
                 conjoint.conjoint = currentUser.name.first + " " + currentUser.name.last;
             }
         };
-                
+
+        // remove
+        this.removeGuest = function(currentUser) {
+            // removing guest from guest list
+            var index = _.findIndex(_guests, currentUser);
+            if (index !== -1) {
+                _guests.splice(index, 1);    
+            }
+            // removing any related conjoint association
+            var associatedConjoint = this.getAssociatedConjoint(currentUser.name.first, currentUser.name.last);
+            if (associatedConjoint) {
+                associatedConjoint.conjoint = "";
+            }
+        };
+
+        // update
         this.updateGuest = function(initialCurrentUser, currentUser) {
           
             if (currentUser.conjoint === null) {
@@ -8298,48 +8269,38 @@ angular.module("pigeSettingsModule", [
             }
             
             // replacing guest in guest list with new value
-            _guests.splice(_.findIndex(_guests, initialCurrentUser), 1, currentUser);
+            var index = _.findIndex(_guests, initialCurrentUser);
+            if (index !== -1) {
+                _guests.splice(index, 1, currentUser);
+            }
             
             // updating any related guest association
             var associatedConjoint = this.getAssociatedConjoint(initialCurrentUser.name.first, initialCurrentUser.name.last);
             if (associatedConjoint) {
-                associatedConjoint.conjoint = (currentUser.conjoint === "")? "" : currentUser.name.full;
+                associatedConjoint.conjoint =
+                    (currentUser.conjoint === "" || associatedConjoint.name.full !== currentUser.conjoint)?
+                        "" :
+                        currentUser.name.full;
             }
-
-            // applying any newly affected guest association
             else if (currentUser.conjoint !== "") {
+                
+                // reflecting guest association to the other conjoint
                 var splitConjointName = currentUser.conjoint.split(" ");
                 var conjoinedGuest = this.getGuestDataFromName(splitConjointName[0], splitConjointName[1]);
                 if (conjoinedGuest) {
                     conjoinedGuest.conjoint = currentUser.name.full;
-                }                           
+                }
+                
             }
 
         };
         
+        // apply guest selection
         this.applyGuestPige = function(currentUser, pigedGuestFullName) {
-            _guests[_.findIndex(_guests, currentUser)].pigedGuest = pigedGuestFullName;
-        };
-        
-        // remove
-        this.removeGuest = function(currentUser) {
-            // removing guest from guest list
-            _guests.splice(_.findIndex(_guests, currentUser), 1);
-            // removing any related conjoint association
-            var associatedConjoint = this.getAssociatedConjoint(currentUser.name.first, currentUser.name.last);
-            if (associatedConjoint) {
-                associatedConjoint.conjoint = "";
+            var index = _.findIndex(_guests, currentUser);
+            if (index !== -1) {
+                _guests[index].pigedGuest = pigedGuestFullName;    
             }
-        };
-        
-        // get all guests
-        this.getGuests = function() {
-            return _guests;
-        };
-
-        // reset all
-        this.resetGuests = function() {
-            _guests = [];    
         };
         
         // get associated conjoint
@@ -8362,43 +8323,48 @@ angular.module("pigeSettingsModule", [
                 return (guest.conjoint === first + " " + last);
             }.bind(this));
         };
-
-        /* ---------
-        [ settings ]
-        --------- */
         
-        // get
-        this.getSettings = function() {
-            return _settings;
-        };
-        
-        // update
-        this.updateSettings = function(updatedSettings) {
-            _settings = updatedSettings;
-        };
-        
-        // reset
-        this.resetSettings = function() {
-            _settings = angular.copy(_initialSettings);
-        };
-        
-        /* ------
-        [ admin ]
-        ------ */
-        
-        this.getNumberOfAdmin = function() {
+        this.getNumberOfRegisteredAdmin = function() {
             return _guests.filter(function(guest){
                 return guest.isAdmin;
             }).length;
         };
-    
+
+
+        /* -------------
+        [ current user ]
+        ------------- */
+
+        this.fetchCurrentUser = function() {
+            return $http.get('data/guests.json')
+                .then(function onSuccess(response) {
+                    $q.defer().resolve();    
+                    return response.data.defaultUser;
+                })
+                .catch(function onError(response) {
+                    console.log(response);
+                });
+        };
+        
+        this.getCurrentUser = function() {
+            return this.fetchCurrentUser().then(function(data){
+                return data;
+            });
+        };
+
         /* --------
         [ session ]
         -------- */
         
-        this.isCurrentUserAlreadyRegistered = function() {
-            return this.guests.some(function(object){
-                return (object.name.first === this.currentUser.name.first && object.name.last === this.currentUser.name.last);
+//        this.isCurrentUserAlreadyRegistered = function() {
+//            return this.guests.some(function(object){
+//                return (object.name.first === this.currentUser.name.first && object.name.last === this.currentUser.name.last);
+//            }.bind(this));
+//        };
+        
+        this.isCurrentUserAlreadyRegistered = function(first, last) {
+            return _guests.some(function(object){
+                return (object.name.first === first && object.name.last === last);
             }.bind(this));
         };
         
@@ -8450,12 +8416,11 @@ angular.module("pigeSettingsModule", [
     }])    
 
     .controller("appController", function(
-         $location,
-         $routeParams,
-         $sanitize,
-         $scope, 
-         $translate,
-         dataService
+        $location,
+        $routeParams,
+        $sanitize,
+        $translate,
+        dataService
     ){
         
         this.$onInit = function() {
@@ -8465,21 +8430,16 @@ angular.module("pigeSettingsModule", [
             this.setBothSettings();
             
             // guests
-            this.setGuests();
+            this.initializeGuests();
+            
+            // current user
+            this.resetBothCurrentUser();
 
             // set app to initial state
             this.onLogout();
             
-            $scope.guestsTableData = this.guests;
-                                    
         };
-        
-        this.isCurrentUserAlreadyRegistered = function() {
-            return this.guests.some(function(object){
-                return (object.name.first === this.currentUser.name.first && object.name.last === this.currentUser.name.last);
-            }.bind(this));
-        };
-        
+                
         this.areRequiredFieldsFilledIn = function() {
             return (
                 (this.currentUser.name.first && this.currentUser.name.first !== "") &&
@@ -8488,11 +8448,15 @@ angular.module("pigeSettingsModule", [
         };
         
         this.isSignInDisabled = function() {
-            return (!this.currentUser.name.first || !this.currentUser.name.last) || this.isCurrentUserAlreadyRegistered();
+            return !this.areRequiredFieldsFilledIn() || !dataService.isCurrentUserAlreadyRegistered(
+                this.currentUser.name.first, this.currentUser.name.last
+            );
         };
         
         this.isSignUpDisabled = function() {
-            return (!this.currentUser.name.first || !this.currentUser.name.last) || this.isCurrentUserAlreadyRegistered();
+            return !this.areRequiredFieldsFilledIn() || dataService.isCurrentUserAlreadyRegistered(
+                this.currentUser.name.first, this.currentUser.name.last
+            );            
         };
                 
         this.viewGuestIsDisplayed = function() {
@@ -8504,16 +8468,30 @@ angular.module("pigeSettingsModule", [
         ------------- */
 
         this.resetCurrentUser = function() {
-            this.currentUser = angular.copy(dataService.getCurrentUser());
+            dataService.getCurrentUser().then(function(currentUser){
+                this.currentUser = currentUser;
+            }.bind(this));
         };
         
         this.resetInitialCurrentUser = function() {
             this.initialCurrentUser = angular.copy(this.currentUser);
         };
+
+        this.resetBothCurrentUser = function() {
+            this.resetCurrentUser();
+            this.resetInitialCurrentUser();
+        };
+
         
         /* -------
         [ guests ]
         ------- */
+        
+        this.initializeGuests = function() {
+            dataService.fetchGuests().then(function(guests){
+                this.guests = angular.copy(guests);
+            }.bind(this));            
+        };
         
         this.setGuests = function() {
             this.guests = dataService.getGuests();
@@ -8542,6 +8520,7 @@ angular.module("pigeSettingsModule", [
         this.onSaveUser = function() {
             this.currentUser.name.full = this.currentUser.name.first + " " + this.currentUser.name.last;
             dataService.updateGuest(this.initialCurrentUser, angular.copy(this.currentUser));
+            this.setGuests();
             this.resetInitialCurrentUser();
         };
         
@@ -8552,7 +8531,10 @@ angular.module("pigeSettingsModule", [
                 !this.currentUser.name.last ||
                 (
                     dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last) &&
-                    (this.currentUser.conjoint === this.initialCurrentUser.conjoint)
+                    (
+                        this.currentUser.conjoint === this.initialCurrentUser.conjoint &&
+                        this.currentUser.isAdmin === this.initialCurrentUser.isAdmin
+                    )
                 )
             );
         };
@@ -8566,21 +8548,24 @@ angular.module("pigeSettingsModule", [
             $location.path("default");
         };
         
-        this.onSignIn = function() {
+        this.onSignUp = function() {
             // updating user name values
-            this.currentUser.name.full = this.currentUser.name.first + ' ' + this.currentUser.name.last;
+            this.currentUser.name.full = this.currentUser.name.first + " " + this.currentUser.name.last;
             for (var key in this.currentUser.name){
                 this.currentUser.name[key] = this.currentUser.name[key].trim();
             }
             // adding user to dataService
             dataService.addGuest(angular.copy(this.currentUser));
+//            this.guests.push(angular.copy(this.currentUser));
             // flagging the user as logged in
             this.isUserLoggedIn = true;
+            // todo: tobe removed once file upload has been implemented
+            this.setGuests();
             // displaying user view
             this.navigateToViewUser();
         };
         
-        this.onSignUp = function() {
+        this.onSignIn = function() {
             // fetching all data related to registered user
             this.currentUser = dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last);
             this.isUserLoggedIn = true;
@@ -8638,8 +8623,6 @@ angular.module("pigeSettingsModule", [
             // updating current user data
             guest.pigedGuest = pigedGuestFullName;
             
-            console.log(guest.name.full + " > " + pigedGuestFullName);
-        
         };
         
         this.onPigeGuest = function() {
@@ -8647,8 +8630,6 @@ angular.module("pigeSettingsModule", [
         };
         
         this.onAutoPige = function() {
-            
-            console.clear();
             
             this.resetPigedGuests();
             
@@ -8675,7 +8656,6 @@ angular.module("pigeSettingsModule", [
                 // we want to avoid having conjoints as last two guests with no association
                 if (i < 4 && getConjointsStillInTheList(i).length !== 0) {
                     this.guests[i].pigedGuest = getConjointsStillInTheList(i)[Math.floor(Math.random()) * (getConjointsStillInTheList(i).length - 1)];
-                    console.log(this.guests[i].name.full + " >> " + this.guests[i].pigedGuest);
                 }
                 // applying basic guest selection
                 else {
@@ -8697,7 +8677,8 @@ angular.module("pigeSettingsModule", [
             this.guests.forEach(function(guest){
                 guest.pigedGuest = "";
             });
-        };        
+        };
+        
         // settings
 
         this.onEditPigeSettings = function() {
@@ -8706,16 +8687,29 @@ angular.module("pigeSettingsModule", [
 
         
         this.setSettings = function() {
-            this.settings = angular.copy(dataService.getSettings());
+            dataService.fetchSettings().then(function(settings){
+                this.settings = angular.copy(settings);
+            }.bind(this));
         };
         
         this.setInitialSettings = function() {
-            this.initialSettings = angular.copy(dataService.getSettings());
+            dataService.fetchSettings().then(function(settings){
+                this.initialSettings = angular.copy(settings);
+            }.bind(this));
+        };
+
+        // enforcing update of data-binding
+        this.updateSettings = function() {
+            this.settings = angular.copy(this.settings);
+        };
+        
+        this.updateInitialSettings = function() {
+            this.initialSettings = angular.copy(this.settings);
         };
         
         this.onSaveSettings = function() {
-            dataService.updateSettings(this.settings);
-            this.setInitialSettings();
+//            dataService.updateSettings(this.settings);
+            this.updateInitialSettings();
         };
 
         this.isSaveSettingsDisabled = function() {
@@ -8727,18 +8721,16 @@ angular.module("pigeSettingsModule", [
         };
         
         this.setBothSettings = function() {
-            this.setSettings();
-            this.setInitialSettings();
+            dataService.fetchSettings().then(function(settings){
+                this.settings = angular.copy(settings);
+                this.initialSettings = angular.copy(settings);
+            }.bind(this));
         };
         
         // validation
         
         this.onCancel = function() {
             this.navigateToViewUser();
-        };
-
-        this.onUpdate = function() {
-            console.log("update");
         };
         
         // navigate
@@ -8755,7 +8747,6 @@ angular.module("pigeSettingsModule", [
         this.navigateToEditSettings = function() {
             $location.path("/settings");
         };
-
         
     });
     

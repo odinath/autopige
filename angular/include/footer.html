@@ -1,15 +1,16 @@
 <div class="container">
+    
     <span ng-if="!$appCtrl.isUserLoggedIn">
         <button type="button" class="btn btn-primary"
-                ng-disabled="!($appCtrl.areRequiredFieldsFilledIn() && !$appCtrl.isCurrentUserAlreadyRegistered())"
-                ng-click="$appCtrl.onSignIn()">
-            {{ "button.sign.in" | translate }}
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                ng-click="$appCtrl.onSignUp()"
+                ng-disabled="$appCtrl.isSignUpDisabled()">
+            {{ "button.sign.up" | translate }}
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>            
         </button>
         <button type="button" class="btn btn-primary"
-                ng-click="$appCtrl.onSignUp()"
-                ng-disabled="!($appCtrl.areRequiredFieldsFilledIn() && $appCtrl.isCurrentUserAlreadyRegistered())">
-            {{ "button.sign.up" | translate }}
+                ng-click="$appCtrl.onSignIn()"
+                ng-disabled="$appCtrl.isSignInDisabled()">
+            {{ "button.sign.in" | translate }}
             <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
         </button>
     </span>
@@ -92,4 +93,5 @@
             <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
         </button>
     </div>
+    
 </div>

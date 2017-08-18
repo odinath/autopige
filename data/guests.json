@@ -1,0 +1,13 @@
+{ 
+    "defaultUser": {
+        "conjoint": "",
+        "isAdmin": false,
+        "name": {
+            "first": "",
+            "full": "",
+            "last": ""
+        },
+        "pigedGuest": ""
+    },
+    "guests": []
+}
