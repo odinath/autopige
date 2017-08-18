@@ -25,6 +25,7 @@
   "name": "pigeWebApp",
   "repository": ".",
   "scripts": {
-    "start": "grunt build; webpack-dev-server --watch --inline"
+      "install": "npm install -g grunt & npm install -g webpack-dev-server & grunt build",
+      "start": "webpack-dev-server --watch --inline"
   }
 }
