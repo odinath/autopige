@@ -8170,9 +8170,13 @@ angular.module("pigeSettingsModule", [
                 });
         };
 
-        this.fetchSettings().then(function(settings){
-            _settings = settings;
-        });
+        this.resetSettings = function() {
+            this.fetchSettings().then(function(settings){
+                _settings = settings;
+            });            
+        };
+        
+        this.resetSettings();
 
         this.getSettings = function() {
             return _settings;
@@ -8655,7 +8659,7 @@ angular.module("pigeSettingsModule", [
         this.onResetPige = function() {
             this.resetCurrentUser();
             this.resetGuests();
-            this.resetCurrentSettings();
+            this.resetSettings();
             this.setBothSettings();
             this.onLogout();
         };
@@ -8704,7 +8708,7 @@ angular.module("pigeSettingsModule", [
         };
         
         this.resetSettings = function() {
-            dataService.resetCurrentSettings();
+            dataService.resetSettings();
         };
         
         this.setBothSettings = function() {

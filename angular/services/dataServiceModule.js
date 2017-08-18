@@ -28,9 +28,13 @@
                 });
         };
 
-        this.fetchSettings().then(function(settings){
-            _settings = settings;
-        });
+        this.resetSettings = function() {
+            this.fetchSettings().then(function(settings){
+                _settings = settings;
+            });            
+        };
+        
+        this.resetSettings();
 
         this.getSettings = function() {
             return _settings;

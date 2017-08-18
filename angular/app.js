@@ -295,7 +295,7 @@
         this.onResetPige = function() {
             this.resetCurrentUser();
             this.resetGuests();
-            this.resetCurrentSettings();
+            this.resetSettings();
             this.setBothSettings();
             this.onLogout();
         };
@@ -344,7 +344,7 @@
         };
         
         this.resetSettings = function() {
-            dataService.resetCurrentSettings();
+            dataService.resetSettings();
         };
         
         this.setBothSettings = function() {

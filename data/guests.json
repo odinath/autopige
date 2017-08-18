@@ -31,7 +31,7 @@
             "pigedGuest": ""
         },
         {
-            "conjoint": "",
+            "conjoint": "Jérôme Nocquet",
             "isAdmin": true,
             "name": {
                 "first": "Céline",
@@ -41,17 +41,17 @@
             "pigedGuest": ""
         },
         {
-            "conjoint": "",
+            "conjoint": "Céline Chipoy",
             "isAdmin": false,
             "name": {
-                "first": "Cédric",
-                "full": "Cédric Marole",
-                "last": "Marole"
+                "first": "Jérôme",
+                "full": "Jérôme Nocquet",
+                "last": "Nocquet"
             },
             "pigedGuest": ""
         },
         {
-            "conjoint": "",
+            "conjoint": "Richard Laplante",
             "isAdmin": false,
             "name": {
                 "first": "Agathe",
@@ -61,7 +61,7 @@
             "pigedGuest": ""
         },
         {
-            "conjoint": "",
+            "conjoint": "Agathe Baus",
             "isAdmin": false,
             "name": {
                 "first": "Richard",
@@ -71,17 +71,17 @@
             "pigedGuest": ""
         },
         {
-            "conjoint": "",
+            "conjoint": "Josiane Balasko",
             "isAdmin": false,
             "name": {
-                "first": "Suzy",
-                "full": "Suzy Cue",
-                "last": "Cue"
+                "first": "Michel",
+                "full": "Michel Blanc",
+                "last": "Blanc"
             },
             "pigedGuest": ""
         },
         {
-            "conjoint": "",
+            "conjoint": "Michel Blanc",
             "isAdmin": false,
             "name": {
                 "first": "Josiane",
