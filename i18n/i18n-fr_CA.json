@@ -21,6 +21,7 @@
     "label.name.conjoint": "Conjoint de fait",
     "label.name.first": "Prénom",
     "label.name.last": "Nom de famille",
+    "label.required": "obligatoire",
     "message.pige.activated": "La pige a été activée.",
     "message.pige.auto.admin": "Vous pouvez déclencher la pige automatique.",
     "message.pige.auto.guest": "Un invité sera prochainement choisi pour vous automatiquement.",

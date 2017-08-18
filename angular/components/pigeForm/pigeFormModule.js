@@ -12,20 +12,15 @@ angular.module("pigeFormModule", [
     
     this.$onInit = function() {
 
+        // guests
+        this.guests = dataService.getGuests();
+        
         // conjoints
-        
         this.resetConjointsList();
-        
         this.conjointSelectorDisabled = false;
-        
-        // settings
-        
-        this.settings = dataService.getSettings();
         
     };
 
-    this.isCurrentUserAlreadyRegistered = dataService.isCurrentUserAlreadyRegistered;
-    
     this.trimCurrentUserName = function() {
         for (var key in this.currentUser.name) {
             if (this.currentUser.name[key]) {
@@ -90,7 +85,7 @@ angular.module("pigeFormModule", [
             }),
             "name.full"
         );
-        this.conjoints.splice(this.conjoints.indexOf(this.currentUser.name.full), 1);
+        this.conjoints.splice(this.conjoints.indexOf(this.currentUser.name.full), 0);
     };
     
     this.isEditUserActive = function() {
@@ -98,11 +93,13 @@ angular.module("pigeFormModule", [
     };
     
     this.isConjointSelectorDisabled = function() {
-        return !this.isEditUserActive() && (this.conjointSelectorDisabled || this.isCurrentUserAlreadyRegistered());
+        return !this.isEditUserActive() && (this.conjointSelectorDisabled || dataService.isCurrentUserAlreadyRegistered(
+            this.currentUser.name.first, this.currentUser.name.last
+        ));
     };
     
     this.hasNbAdminMaxBeingReached = function() {
-        return (dataService.getNumberOfAdmin() === this.settings.nbAdminMax);
+        return (dataService.getNumberOfRegisteredAdmin() >= this.settings.nbAdminMax);
     };
 
     // admin checkbox
@@ -112,7 +109,9 @@ angular.module("pigeFormModule", [
             return this.hasNbAdminMaxBeingReached() && !this.currentUser.isAdmin;
         }
         else {
-            return (this.hasNbAdminMaxBeingReached() || this.isCurrentUserAlreadyRegistered());
+            return (this.hasNbAdminMaxBeingReached() || dataService.isCurrentUserAlreadyRegistered(
+                this.currentUser.name.first, this.currentUser.name.last
+            ));
         }
     };
 
@@ -132,6 +131,7 @@ angular.module("pigeFormModule", [
     bindings: {
         currentUser: "=",
         guests: "<",
-        mode: "<"
+        mode: "<",
+        settings: "<"
     }
 });

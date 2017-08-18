@@ -12,12 +12,7 @@ angular.module("pigeSettingsModule", [
 
     this.$onInit = function() {
         
-        $(function () {
-            $('#datetimepicker').datetimepicker({
-                sideBySide: true,
-                minDate: new Date()
-            });
-        });
+        console.log(this.settings);
         
     };
     

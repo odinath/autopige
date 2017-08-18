@@ -4,136 +4,92 @@
     
     angular.module("dataServiceModule", [])
 
-    .service('dataService', function() {
+    .service('dataService', function(
+        $http,
+        $q
+    ) {
+
+        /* ---------
+        [ settings ]
+        --------- */
         
-        // todo: make it an external json file read through BLOB + File
-        var _initialSettings = {
-            autoPige: true,
-            nbAdminMax: 1,
-            isPigeActivated: true/*,
-            scheduledDateTime: ""*/
-        };
-        
+        // initial
+
         var _settings = {};
         
-        var _currentUser = {
-            conjoint: "",
-            isAdmin: false,
-            name: {
-                first: "",
-                full: "",
-                last: "",
-            },
-            pigedGuest: ""
+        this.fetchSettings = function() {
+            return $http.get('data/settings.json')
+                .then(function onSuccess(response) {
+                    $q.defer().resolve();    
+                    return response.data;
+                })
+                .catch(function onError(response) {
+                    console.log(response);
+                });
+        };
+
+        this.fetchSettings().then(function(settings){
+            _settings = settings;
+        });
+
+        this.getSettings = function() {
+            return _settings;
+        };
+
+        // current
+        
+        var _currentSettings = {};
+
+        this.resetCurrentSettings = function() {
+            _currentSettings = angular.copy(_settings);
+        };
+
+        this.resetCurrentSettings();
+
+        this.getCurrentSettings = function() {
+            return _settings;
         };
         
-//        var _currentUser = {
-//            conjoint: "Nathalie Dufour",
-//            isAdmin: true,
-//            name: {
-//                first: "Odin",
-//                full: "Odin Marole",
-//                last: "Marole",
-//            },
-//            pigedGuest: ""
-//        };
-
-        var _guests = [];
-        
-//        var _guests = [
-//            {
-//                conjoint: "Nathalie Dufour",
-//                isAdmin: true,
-//                name: {
-//                    first: "Odin",
-//                    full: "Odin Marole",
-//                    last: "Marole",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "Odin Marole",
-//                isAdmin: false,
-//                name: {
-//                    first: "Nathalie",
-//                    full: "Nathalie Dufour",
-//                    last: "Dufour",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: true,
-//                name: {
-//                    first: "Céline",
-//                    full: "Céline Chipoy",
-//                    last: "Chipoy",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Cédric",
-//                    full: "Cédric Marole",
-//                    last: "Marole",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Agathe",
-//                    full: "Agathe Baus",
-//                    last: "Baus",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Richard",
-//                    full: "Richard Laplante",
-//                    last: "Laplante",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Suzy",
-//                    full: "Suzy Cue",
-//                    last: "Cue",
-//                },
-//                pigedGuest: ""
-//            },
-//            {
-//                conjoint: "",
-//                isAdmin: false,
-//                name: {
-//                    first: "Josiane",
-//                    full: "Josiane Balasko",
-//                    last: "Balasko",
-//                },
-//                pigedGuest: ""
-//            }
-//        ];
-        
-        /* -------------
-        [ current user ]
-        ------------- */
-        
-        this.getCurrentUser = function() {
-            return _currentUser;
+        // update
+        this.updateCurrentSettings = function(updatedSettings) {
+            _currentSettings = updatedSettings;
         };
         
         /* -------
         [ guests ]
         ------- */ 
+        
+        var _guests = [];
+        
+        this.fetchGuests = function() {
+            return $http.get('data/guests.json')
+                .then(function onSuccess(response) {
+                    $q.defer().resolve();    
+                    return response.data.guests;
+                })
+                .catch(function onError(response) {
+                    console.log(response);
+                });
+        };
+
+        this.fetchGuests().then(function(guests){
+            _guests = guests;
+        });
+
+        // upload
+//        this.uploadGuests = function() {
+//        };
+        
+        // get all guests
+        this.getGuests = function() {
+            return _guests;
+        };
+
+        // reset
+        this.resetGuests = function() {
+            _guests = [];
+//            this.uploadGuests();
+        };        
         
         // add
         this.addGuest = function(currentUser) {
@@ -144,7 +100,19 @@
                 conjoint.conjoint = currentUser.name.first + " " + currentUser.name.last;
             }
         };
-                
+
+        // remove
+        this.removeGuest = function(currentUser) {
+            // removing guest from guest list
+            _guests.splice(_.findIndex(_guests, currentUser), 1);
+            // removing any related conjoint association
+            var associatedConjoint = this.getAssociatedConjoint(currentUser.name.first, currentUser.name.last);
+            if (associatedConjoint) {
+                associatedConjoint.conjoint = "";
+            }
+        };
+
+        // update
         this.updateGuest = function(initialCurrentUser, currentUser) {
           
             if (currentUser.conjoint === null) {
@@ -171,29 +139,9 @@
 
         };
         
+        // apply guest selection
         this.applyGuestPige = function(currentUser, pigedGuestFullName) {
             _guests[_.findIndex(_guests, currentUser)].pigedGuest = pigedGuestFullName;
-        };
-        
-        // remove
-        this.removeGuest = function(currentUser) {
-            // removing guest from guest list
-            _guests.splice(_.findIndex(_guests, currentUser), 1);
-            // removing any related conjoint association
-            var associatedConjoint = this.getAssociatedConjoint(currentUser.name.first, currentUser.name.last);
-            if (associatedConjoint) {
-                associatedConjoint.conjoint = "";
-            }
-        };
-        
-        // get all guests
-        this.getGuests = function() {
-            return _guests;
-        };
-
-        // reset all
-        this.resetGuests = function() {
-            _guests = [];    
         };
         
         // get associated conjoint
@@ -216,43 +164,48 @@
                 return (guest.conjoint === first + " " + last);
             }.bind(this));
         };
-
-        /* ---------
-        [ settings ]
-        --------- */
         
-        // get
-        this.getSettings = function() {
-            return _settings;
-        };
-        
-        // update
-        this.updateSettings = function(updatedSettings) {
-            _settings = updatedSettings;
-        };
-        
-        // reset
-        this.resetSettings = function() {
-            _settings = angular.copy(_initialSettings);
-        };
-        
-        /* ------
-        [ admin ]
-        ------ */
-        
-        this.getNumberOfAdmin = function() {
+        this.getNumberOfRegisteredAdmin = function() {
             return _guests.filter(function(guest){
                 return guest.isAdmin;
             }).length;
         };
-    
+
+
+        /* -------------
+        [ current user ]
+        ------------- */
+
+        this.fetchCurrentUser = function() {
+            return $http.get('data/guests.json')
+                .then(function onSuccess(response) {
+                    $q.defer().resolve();    
+                    return response.data.defaultUser;
+                })
+                .catch(function onError(response) {
+                    console.log(response);
+                });
+        };
+        
+        this.getCurrentUser = function() {
+            return this.fetchCurrentUser().then(function(data){
+                return data;
+            });
+        };
+
         /* --------
         [ session ]
         -------- */
         
-        this.isCurrentUserAlreadyRegistered = function() {
-            return this.guests.some(function(object){
-                return (object.name.first === this.currentUser.name.first && object.name.last === this.currentUser.name.last);
+//        this.isCurrentUserAlreadyRegistered = function() {
+//            return this.guests.some(function(object){
+//                return (object.name.first === this.currentUser.name.first && object.name.last === this.currentUser.name.last);
+//            }.bind(this));
+//        };
+        
+        this.isCurrentUserAlreadyRegistered = function(first, last) {
+            return _guests.some(function(object){
+                return (object.name.first === first && object.name.last === last);
             }.bind(this));
         };
         

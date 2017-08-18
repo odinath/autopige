@@ -43,12 +43,11 @@
     }])    
 
     .controller("appController", function(
-         $location,
-         $routeParams,
-         $sanitize,
-         $scope, 
-         $translate,
-         dataService
+        $location,
+        $routeParams,
+        $sanitize,
+        $translate,
+        dataService
     ){
         
         this.$onInit = function() {
@@ -59,20 +58,15 @@
             
             // guests
             this.setGuests();
+            
+            // current user
+            this.resetBothCurrentUser();
 
             // set app to initial state
             this.onLogout();
             
-            $scope.guestsTableData = this.guests;
-                                    
         };
-        
-        this.isCurrentUserAlreadyRegistered = function() {
-            return this.guests.some(function(object){
-                return (object.name.first === this.currentUser.name.first && object.name.last === this.currentUser.name.last);
-            }.bind(this));
-        };
-        
+                
         this.areRequiredFieldsFilledIn = function() {
             return (
                 (this.currentUser.name.first && this.currentUser.name.first !== "") &&
@@ -81,11 +75,15 @@
         };
         
         this.isSignInDisabled = function() {
-            return (!this.currentUser.name.first || !this.currentUser.name.last) || this.isCurrentUserAlreadyRegistered();
+            return !this.areRequiredFieldsFilledIn() || !dataService.isCurrentUserAlreadyRegistered(
+                this.currentUser.name.first, this.currentUser.name.last
+            );
         };
         
         this.isSignUpDisabled = function() {
-            return (!this.currentUser.name.first || !this.currentUser.name.last) || this.isCurrentUserAlreadyRegistered();
+            return !this.areRequiredFieldsFilledIn() || dataService.isCurrentUserAlreadyRegistered(
+                this.currentUser.name.first, this.currentUser.name.last
+            );            
         };
                 
         this.viewGuestIsDisplayed = function() {
@@ -97,12 +95,20 @@
         ------------- */
 
         this.resetCurrentUser = function() {
-            this.currentUser = angular.copy(dataService.getCurrentUser());
+            dataService.getCurrentUser().then(function(currentUser){
+                this.currentUser = currentUser;
+            }.bind(this));
         };
         
         this.resetInitialCurrentUser = function() {
             this.initialCurrentUser = angular.copy(this.currentUser);
         };
+
+        this.resetBothCurrentUser = function() {
+            this.resetCurrentUser();
+            this.resetInitialCurrentUser();
+        };
+
         
         /* -------
         [ guests ]
@@ -110,6 +116,9 @@
         
         this.setGuests = function() {
             this.guests = dataService.getGuests();
+//            dataService.fetchGuests().then(function(guests){
+//                this.guests = guests;    
+//            }.bind(this));
         };
         
         this.resetGuests = function() {
@@ -145,7 +154,10 @@
                 !this.currentUser.name.last ||
                 (
                     dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last) &&
-                    (this.currentUser.conjoint === this.initialCurrentUser.conjoint)
+                    (
+                        this.currentUser.conjoint === this.initialCurrentUser.conjoint &&
+                        this.currentUser.isAdmin === this.initialCurrentUser.isAdmin
+                    )
                 )
             );
         };
@@ -159,7 +171,7 @@
             $location.path("default");
         };
         
-        this.onSignIn = function() {
+        this.onSignUp = function() {
             // updating user name values
             this.currentUser.name.full = this.currentUser.name.first + ' ' + this.currentUser.name.last;
             for (var key in this.currentUser.name){
@@ -167,13 +179,16 @@
             }
             // adding user to dataService
             dataService.addGuest(angular.copy(this.currentUser));
+            this.guests.push(angular.copy(this.currentUser));
             // flagging the user as logged in
             this.isUserLoggedIn = true;
+            // todo: tobe removed once file upload has been implemented
+            this.setGuests();
             // displaying user view
             this.navigateToViewUser();
         };
         
-        this.onSignUp = function() {
+        this.onSignIn = function() {
             // fetching all data related to registered user
             this.currentUser = dataService.getGuestDataFromName(this.currentUser.name.first, this.currentUser.name.last);
             this.isUserLoggedIn = true;
@@ -231,8 +246,6 @@
             // updating current user data
             guest.pigedGuest = pigedGuestFullName;
             
-            console.log(guest.name.full + " > " + pigedGuestFullName);
-        
         };
         
         this.onPigeGuest = function() {
@@ -240,8 +253,6 @@
         };
         
         this.onAutoPige = function() {
-            
-            console.clear();
             
             this.resetPigedGuests();
             
@@ -268,7 +279,6 @@
                 // we want to avoid having conjoints as last two guests with no association
                 if (i < 4 && getConjointsStillInTheList(i).length !== 0) {
                     this.guests[i].pigedGuest = getConjointsStillInTheList(i)[Math.floor(Math.random()) * (getConjointsStillInTheList(i).length - 1)];
-                    console.log(this.guests[i].name.full + " >> " + this.guests[i].pigedGuest);
                 }
                 // applying basic guest selection
                 else {
@@ -281,7 +291,7 @@
         this.onResetPige = function() {
             this.resetCurrentUser();
             this.resetGuests();
-            this.resetSettings();
+            this.resetCurrentSettings();
             this.setBothSettings();
             this.onLogout();
         };
@@ -299,16 +309,29 @@
 
         
         this.setSettings = function() {
-            this.settings = angular.copy(dataService.getSettings());
+            dataService.fetchSettings().then(function(settings){
+                this.settings = angular.copy(settings);
+            }.bind(this));
         };
         
         this.setInitialSettings = function() {
-            this.initialSettings = angular.copy(dataService.getSettings());
+            dataService.fetchSettings().then(function(settings){
+                this.initialSettings = angular.copy(settings);
+            }.bind(this));
+        };
+
+        // enforcing update of data-binding
+        this.updateSettings = function() {
+            this.settings = angular.copy(this.settings);
+        };
+        
+        this.updateInitialSettings = function() {
+            this.initialSettings = angular.copy(this.settings);
         };
         
         this.onSaveSettings = function() {
-            dataService.updateSettings(this.settings);
-            this.setInitialSettings();
+//            dataService.updateSettings(this.settings);
+            this.updateInitialSettings();
         };
 
         this.isSaveSettingsDisabled = function() {
@@ -316,22 +339,20 @@
         };
         
         this.resetSettings = function() {
-            dataService.resetSettings();
+            dataService.resetCurrentSettings();
         };
         
         this.setBothSettings = function() {
-            this.setSettings();
-            this.setInitialSettings();
+            dataService.fetchSettings().then(function(settings){
+                this.settings = angular.copy(settings);
+                this.initialSettings = angular.copy(settings);
+            }.bind(this));
         };
         
         // validation
         
         this.onCancel = function() {
             this.navigateToViewUser();
-        };
-
-        this.onUpdate = function() {
-            console.log("update");
         };
         
         // navigate
@@ -348,7 +369,6 @@
         this.navigateToEditSettings = function() {
             $location.path("/settings");
         };
-
         
     });
     
