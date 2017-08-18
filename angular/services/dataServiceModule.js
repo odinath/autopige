@@ -108,7 +108,10 @@
         // remove
         this.removeGuest = function(currentUser) {
             // removing guest from guest list
-            _guests.splice(_.findIndex(_guests, currentUser), 1);
+            var index = _.findIndex(_guests, currentUser);
+            if (index !== -1) {
+                _guests.splice(index, 1);    
+            }
             // removing any related conjoint association
             var associatedConjoint = this.getAssociatedConjoint(currentUser.name.first, currentUser.name.last);
             if (associatedConjoint) {
@@ -124,7 +127,10 @@
             }
             
             // replacing guest in guest list with new value
-            _guests.splice(_.findIndex(_guests, initialCurrentUser), currentUser);
+            var index = _.findIndex(_guests, initialCurrentUser);
+            if (index !== -1) {
+                _guests.splice(index, 1, currentUser);
+            }
             
             // updating any related guest association
             var associatedConjoint = this.getAssociatedConjoint(initialCurrentUser.name.first, initialCurrentUser.name.last);
@@ -149,7 +155,10 @@
         
         // apply guest selection
         this.applyGuestPige = function(currentUser, pigedGuestFullName) {
-            _guests[_.findIndex(_guests, currentUser)].pigedGuest = pigedGuestFullName;
+            var index = _.findIndex(_guests, currentUser);
+            if (index !== -1) {
+                _guests[index].pigedGuest = pigedGuestFullName;    
+            }
         };
         
         // get associated conjoint
