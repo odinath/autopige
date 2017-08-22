@@ -22,7 +22,7 @@
     "label.name.first": "First Name",
     "label.name.last": "Last Name",
     "label.required": "required",
-    "message.pige.activated": "The pige has been activated. User info cannot get edited anymore. fff",
+    "message.pige.activated": "The pige has been activated. User info cannot get edited anymore.",
     "message.pige.auto.admin": "You can go ahead and trigger the AutoPige.",
     "message.pige.auto.guest": "Your guest selection will soon get triggered automatically .",
     "message.pige.not.activated": "The pige has not been activated yet. No guest selection can currently get triggered.",
